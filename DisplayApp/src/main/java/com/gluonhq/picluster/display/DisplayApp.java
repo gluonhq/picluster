@@ -19,6 +19,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class DisplayApp extends Application {
 
@@ -28,6 +29,7 @@ public class DisplayApp extends Application {
     private GridPane gridPane;
     private int SIZE_X, SIZE_Y;
     private volatile boolean run;
+    private final AtomicLong counter = new AtomicLong(-1);
 
     @Override
     public void start(Stage primaryStage) {
@@ -58,7 +60,7 @@ public class DisplayApp extends Application {
         primaryStage.setY(y);
 
         splitImage(imageView.snapshot(null, null));
-        Button split = new Button("Split");
+        Button split = new Button("Start");
         split.setOnAction(e -> {
             run = ! run;
             if (run) {
@@ -85,10 +87,6 @@ public class DisplayApp extends Application {
         gridPane = new GridPane();
         for (int i = 0; i < SIZE_X; i++) {
             for (int j = 0; j < SIZE_Y; j++) {
-                // TODO: Read opacity from server
-//                double opacity = 0.5 + (double) new Random().nextInt(SIZE) / (double) (2d * SIZE);
-
-//                WritableImage wImage = processImageChunk(reader, width, height, i, j, opacity);
                 WritableImage wImage = new WritableImage(reader, i * width, j * height, width, height);
 
                 ImageView imageView = new ImageView(wImage);
@@ -101,16 +99,21 @@ public class DisplayApp extends Application {
     }
 
     private void processTask() {
+        counter.set(-1);
         Thread thread = new Thread(() -> {
+            long count = 0 ;
             while (run) {
-                int chunkId_X = new Random().nextInt(SIZE_X);
-                int chunkId_Y = new Random().nextInt(SIZE_Y);
-                double opacity = 0.5 + (double) new Random().nextInt(SIZE) / (double) (2d * SIZE);
-                processImageChunk(chunkId_X, chunkId_Y, opacity);
-                try {
-                    Thread.sleep(10 + new Random().nextInt(10));
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                count++;
+                if (counter.getAndSet(count) == -1) {
+                    int chunkId_X = new Random().nextInt(SIZE_X);
+                    int chunkId_Y = new Random().nextInt(SIZE_Y);
+                    double opacity = 0.5 + (double) new Random().nextInt(SIZE) / (2d * SIZE);
+                    processImageChunk(chunkId_X, chunkId_Y, opacity);
+                    try {
+                        Thread.sleep(10 + new Random().nextInt(10));
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
@@ -119,17 +122,20 @@ public class DisplayApp extends Application {
     }
 
     private void processImageChunk(int i, int j, double opacity) {
-        Platform.runLater(() -> gridPane.getChildren().stream()
-                .filter(ImageView.class::isInstance)
-                .filter(n -> GridPane.getColumnIndex(n) == i &&
-                        GridPane.getRowIndex(n) == j)
-                .map(ImageView.class::cast)
-                .findFirst()
+        Platform.runLater(() -> {
+            gridPane.getChildren().stream()
+                    .filter(ImageView.class::isInstance)
+                    .map(ImageView.class::cast)
+                    .filter(n -> GridPane.getColumnIndex(n) == i &&
+                            GridPane.getRowIndex(n) == j)
+                    .findFirst()
 //                .ifPresent(n -> n.setOpacity(opacity)));
-                .ifPresent(n -> {
-                    Image newImage = processImagePixels(n.getImage(), opacity);
-                    n.setImage(newImage);
-                }));
+                    .ifPresent(n -> {
+                        Image newImage = processImagePixels(n.getImage(), opacity);
+                        n.setImage(newImage);
+                    });
+            counter.set(-1);
+        });
     }
 
     private WritableImage processImagePixels(Image chunk, double opacity) {
