@@ -76,7 +76,9 @@ public class DisplayApp extends Application {
         GridPane pane = new GridPane();
         for (int i = 0; i < SIZE_X; i++) {
             for (int j = 0; j < SIZE_Y; j++) {
+                // TODO: Read opacity from server
                 double opacity = 0.5 + (double) new Random().nextInt(SIZE) / (double) (2d * SIZE);
+                
                 WritableImage wImage = processImageChunk(reader, width, height, i, j, opacity);
 
                 ImageView imageView = new ImageView(wImage);
