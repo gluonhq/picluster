@@ -56,7 +56,7 @@ public class DisplayApp extends Application {
         primaryStage.setY(y);
 
         Button split = new Button("Split");
-        split.setOnAction(e -> splitImage(scene.snapshot(null)));
+        split.setOnAction(e -> splitImage(imageView.snapshot(null, null)));
         StackPane.setAlignment(split, Pos.TOP_LEFT);
         imagePane.getChildren().add(split);
     }
