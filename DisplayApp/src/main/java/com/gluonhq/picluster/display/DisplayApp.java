@@ -1,6 +1,8 @@
 package com.gluonhq.picluster.display;
 
 import javafx.application.Application;
+import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -13,32 +15,50 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import java.util.Random;
 
 public class DisplayApp extends Application {
 
-    private static final int SIZE = 8;
-    private static final double scale = 0.9;
+    private static final int SIZE = 1024;
 
     private StackPane imagePane;
 
     @Override
     public void start(Stage primaryStage) {
+        double x = Screen.getScreens().stream()
+                .mapToDouble(s -> s.getBounds().getMinX())
+                .min().orElse(0);
+        double y = Screen.getScreens().stream()
+                .mapToDouble(s -> s.getBounds().getMinY())
+                .min().orElse(0);
+        double w = Screen.getScreens().stream()
+                .mapToDouble(s -> s.getBounds().getMaxX())
+                .max().orElse(0) - x;
+        double h = Screen.getScreens().stream()
+                .mapToDouble(s -> s.getBounds().getMaxY())
+                .max().orElse(0) - y;
+
         Image image = new Image(DisplayApp.class.getResourceAsStream("oracleboat.jpg"));
         ImageView imageView = new ImageView(image);
-        imageView.setFitWidth(image.getWidth() * scale);
+        imageView.setFitWidth(w);
         imageView.setPreserveRatio(true);
         imagePane = new StackPane(imageView);
-        BorderPane root = new BorderPane(imagePane);
-        Scene scene = new Scene(root, 1200, 800);
+
+        Scene scene = new Scene(imagePane, w, h);
         primaryStage.setScene(scene);
+        primaryStage.initStyle(StageStyle.UNDECORATED);
         primaryStage.show();
+        primaryStage.setX(x);
+        primaryStage.setY(y);
 
         Button split = new Button("Split");
-        split.setOnAction(e -> splitImage(image));
-        root.setBottom(split);
+        split.setOnAction(e -> splitImage(scene.snapshot(null)));
+        StackPane.setAlignment(split, Pos.TOP_LEFT);
+        imagePane.getChildren().add(split);
     }
 
     private void splitImage(Image fullImage) {
@@ -53,7 +73,6 @@ public class DisplayApp extends Application {
         }
         int width = (int) (fullImage.getWidth() / SIZE_X);
         int height = (int) (fullImage.getHeight() / SIZE_Y);
-
         GridPane pane = new GridPane();
         for (int i = 0; i < SIZE_X; i++) {
             for (int j = 0; j < SIZE_Y; j++) {
@@ -61,12 +80,11 @@ public class DisplayApp extends Application {
                 WritableImage wImage = processImageChunk(reader, width, height, i, j, opacity);
 
                 ImageView imageView = new ImageView(wImage);
-                imageView.setFitWidth(width * scale);
+                imageView.setFitWidth(width);
                 imageView.setPreserveRatio(true);
                 pane.add(imageView, i, j);
             }
         }
-
         imagePane.getChildren().setAll(new Group(pane));
     }
 
