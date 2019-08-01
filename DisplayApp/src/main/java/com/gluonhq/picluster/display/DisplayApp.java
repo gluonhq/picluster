@@ -1,5 +1,7 @@
 package com.gluonhq.picluster.display;
 
+import com.gluonhq.picluster.display.model.Chunk;
+import com.gluonhq.picluster.display.service.Service;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -30,6 +32,7 @@ public class DisplayApp extends Application {
     private int SIZE_X, SIZE_Y;
     private volatile boolean run;
     private final AtomicLong counter = new AtomicLong(-1);
+    private Service service;
 
     @Override
     public void start(Stage primaryStage) {
@@ -60,16 +63,19 @@ public class DisplayApp extends Application {
         primaryStage.setY(y);
 
         splitImage(imageView.snapshot(null, null));
-        Button split = new Button("Start");
-        split.setOnAction(e -> {
-            run = ! run;
-            if (run) {
-                processTask();
-            }
+//        Button split = new Button("Start");
+//        split.setOnAction(e -> {
+//            run = ! run;
+//            if (run) {
+//                processTask();
+//            }
+//
+//        });
+//        StackPane.setAlignment(split, Pos.TOP_LEFT);
+//        imagePane.getChildren().add(split);
 
-        });
-        StackPane.setAlignment(split, Pos.TOP_LEFT);
-        imagePane.getChildren().add(split);
+        service = new Service();
+        service.start(this::processImageChunk);
     }
 
     private void splitImage(Image fullImage) {
@@ -108,7 +114,7 @@ public class DisplayApp extends Application {
                     int chunkId_X = new Random().nextInt(SIZE_X);
                     int chunkId_Y = new Random().nextInt(SIZE_Y);
                     double opacity = 0.5 + (double) new Random().nextInt(SIZE) / (2d * SIZE);
-                    processImageChunk(chunkId_X, chunkId_Y, opacity);
+                    processImageChunk(new Chunk(chunkId_X, chunkId_Y, opacity));
                     try {
                         Thread.sleep(10 + new Random().nextInt(10));
                     } catch (InterruptedException e) {
@@ -121,17 +127,17 @@ public class DisplayApp extends Application {
         thread.start();
     }
 
-    private void processImageChunk(int i, int j, double opacity) {
+    private void processImageChunk(Chunk chunk) {
         Platform.runLater(() -> {
             gridPane.getChildren().stream()
                     .filter(ImageView.class::isInstance)
                     .map(ImageView.class::cast)
-                    .filter(n -> GridPane.getColumnIndex(n) == i &&
-                            GridPane.getRowIndex(n) == j)
+                    .filter(n -> GridPane.getColumnIndex(n) == chunk.getX() &&
+                            GridPane.getRowIndex(n) == chunk.getY())
                     .findFirst()
 //                .ifPresent(n -> n.setOpacity(opacity)));
                     .ifPresent(n -> {
-                        Image newImage = processImagePixels(n.getImage(), opacity);
+                        Image newImage = processImagePixels(n.getImage(), chunk.getOpacity());
                         n.setImage(newImage);
                     });
             counter.set(-1);
@@ -153,6 +159,11 @@ public class DisplayApp extends Application {
             }
         }
         return wImage;
+    }
+
+    @Override
+    public void stop() {
+        service.stop();
     }
 
     public static void main(String[] args) {
