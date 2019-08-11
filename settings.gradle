@@ -1,1 +1,1 @@
-include 'DisplayApp', 'Client'
+include 'DisplayApp', 'Client', 'Server'
