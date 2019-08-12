@@ -1,51 +1,30 @@
 package com.gluonhq.picluster.server;
 
-import com.sun.net.httpserver.HttpContext;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpServer;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.InetSocketAddress;
-import java.net.URI;
-
-import java.util.concurrent.Executors
-
 public class Main {
 
-    static final int PORT = 8080;
-
-    static final int POOLSIZE = 32;
-
+    /*
+     * This is the main entrypoint for the server on Ubuntu.
+     * It deals with
+     * 1. requests from external clients (currently sending a URL containing an image)
+     *    Those are handled by the ExternalRequestHandler
+     * 2. requests from worker devices. Those are handled by the DeviceListener
+     *
+     * Both components have their own asynchronous communication with their peers, and they
+     * communicate via the static TaskQueue. ExternalRequestsHandler will put requests
+     * on the taskQueue, and wait until they are answered.
+     * DeviceListener will listen for devices that are waiting for work, and hand them a task.
+     * When a device is ready, it will again contact the DeviceListener and provide the answer.
+     * The DeviceListener will then mark the task as answered, and the ExternalRequestHandler
+     * will answer the original requester.
+     * TODO: the answer needs to go to not only the original requester, but also to the videoclient
+     */
     public static void main(String[] args) throws Exception {
         System.err.println("Starting main server");
-        HttpServer server = HttpServer.create(new InetSocketAddress(PORT),0);
-        HttpContext context = server.createContext("/");
-        Handler handler = new Handler();
-        context.setHandler(handler);
-        server.setExecutor(Executors.newFixedThreadPool(POOLSIZE));
-        server.start();
+        DeviceListener dl = new DeviceListener();
+        dl.startListening();
+        ExternalRequestHandler ext = new ExternalRequestHandler();
+        ext.startListening();
     }
 
-    static class Handler implements HttpHandler {
-        @Override
-        public void handle(HttpExchange exchange) throws IOException {
-            System.err.println("HANDLE!");
-            URI uri = exchange.getRequestURI();
-            String query = uri.getQuery();
-            System.err.println("URI = "+ uri);
-            System.err.println("Query = "+ query);
-try {
-Thread.sleep(5000);
-} catch (Exception e) {
-e.printStackTrace();
-}
-            String response = "We're done";
-            exchange.sendResponseHeaders(200, response.length());
-            OutputStream os = exchange.getResponseBody();
-            os.write(response.getBytes());
-            os.close();
-        }
-    }
 
 }

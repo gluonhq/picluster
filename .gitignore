@@ -1,5 +1,6 @@
 *.iml
 .gradle
 .idea
+.class
 DisplayApp/build
 Client/build

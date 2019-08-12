@@ -1,1 +1,1 @@
-include 'DisplayApp', 'Client', 'Server'
+include 'DisplayApp', 'Client', 'Server', 'IotWorker'
