@@ -1,0 +1,9 @@
+plugins {
+    id 'application'
+}
+
+repositories {
+    mavenCentral()
+}
+
+mainClassName= "com.gluonhq.picluster.server.Main"
