@@ -49,8 +49,9 @@ public class DeviceListener {
             public void run() {
                 NodeProxy proxy = new NodeProxy(s);
                 try {
-                    proxy.establish();
-                    proxy.processIncomingMessages();
+                    String IP = s.getInetAddress().toString().substring(1);
+                    proxy.establish(IP);
+                    proxy.processIncomingMessages(IP);
                 } catch (IOException e) {
                     try {
                         s.close();
@@ -76,7 +77,9 @@ public class DeviceListener {
             this.socket = s;
         }
 
-        void establish() throws IOException {
+        void establish(String id) throws IOException {
+            logger.fine("Establish id");
+            this.id = id;
             logger.fine("Establish socket, get is");
             this.is = socket.getInputStream();
             logger.finer("got is, now get os");
@@ -91,20 +94,19 @@ public class DeviceListener {
         }
 
 
-        void processIncomingMessages() throws IOException {
+        void processIncomingMessages(String id) throws IOException {
             logger.fine("Got connection from " + socket);
             String request = br.readLine();
             logger.fine("Got request from worker: " + request);
 
-            processMessage(request);
+            processMessage(id, request);
 
         }
 
 
-        void processMessage(String status) throws IOException {
+        void processMessage(String id, String status) throws IOException {
             // first part is ID
             int idx = status.indexOf(SEP);
-            String id = status.substring(0, idx);
             int idx2 = status.indexOf(SEP, idx + 1);
             String cmd = status.substring(idx + 1, idx2);
             logger.info("Message for " + id + ", cmd = " + cmd + " and proxy id = " + this.id);
@@ -123,7 +125,7 @@ public class DeviceListener {
                 int idx3 = status.indexOf(SEP, idx2 + 1);
                 String taskId = status.substring(idx2 + 1, idx3);
                 String result = status.substring(idx3 + 1);
-                logger.fine("got answer, statyus = "+status+" and idx2 = "+idx2+" and idx3 = "+idx3);
+                logger.fine("got answer, status = "+status+" and idx2 = "+idx2+" and idx3 = "+idx3);
                 Task task = TaskQueue.getTaskById(taskId);
                 logger.info("Task with id " + taskId + " is done and has answer " + result);
                 task.answer = result;
