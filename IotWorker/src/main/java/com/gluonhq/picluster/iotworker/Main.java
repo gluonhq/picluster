@@ -12,14 +12,14 @@ import java.util.Random;
 
 public class Main {
 
-    static final String ID = "foo"; // this needs to be the mac address or so
+    static final String ID = "ID"; // won't use
     static final String SEP = ";";
 
-    static final String SERVER_IP = "127.0.0.1";
+    static final String SERVER_IP = "192.168.68.107";
     static final int SERVER_PORT = 39265;
 
-    static final String DISPLAY_IP = "";
-    static final int DISPLAY_PORT = -1;
+    static final String DISPLAY_IP = "192.168.68.112";
+    static final int DISPLAY_PORT = 6666;
 
     static boolean go = true;
 
@@ -95,7 +95,7 @@ public class Main {
             BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             int chunkId_X = new Random().nextInt(SIZE_X);
             int chunkId_Y = new Random().nextInt(SIZE_Y);
-            double opacity = 100* answer;
+            double opacity = (double) answer / 100d;
             String msg = String.format("%d,%d,%s", chunkId_X, chunkId_Y,
                     String.format("%.2f", opacity).replace(",", "."));
             out.println(msg);
