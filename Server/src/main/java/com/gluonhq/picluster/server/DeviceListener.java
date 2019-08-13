@@ -128,6 +128,8 @@ public class DeviceListener {
                 logger.fine("got answer, status = "+status+" and idx2 = "+idx2+" and idx3 = "+idx3);
                 Task task = TaskQueue.getTaskById(taskId);
                 logger.info("Task with id " + taskId + " is done and has answer " + result);
+                bw.write("thanks\n");
+                bw.flush();
                 task.answer = result;
                 task.latch.countDown();
             }
