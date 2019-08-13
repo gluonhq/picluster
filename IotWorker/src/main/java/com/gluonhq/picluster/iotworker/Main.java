@@ -16,9 +16,11 @@ public class Main {
     static final String SEP = ";";
 
     static final String SERVER_IP = "192.168.68.107";
+    //static final String SERVER_IP = "127.0.0.1";
     static final int SERVER_PORT = 39265;
 
     static final String DISPLAY_IP = "192.168.68.112";
+    //static final String DISPLAY_IP = "127.0.0.1";
     static final int DISPLAY_PORT = 6666;
 
     static boolean go = true;
@@ -61,12 +63,13 @@ public class Main {
             e.printStackTrace();
         }
         int answer = (int)(Math.random()*100);
+        System.err.println("Processing image at "+url+" with taskId "+taskId+", result = "+answer);
         return answer;
     }
 
     static String sendSingleMessage (String msg) throws IOException {
         Socket s = new Socket(SERVER_IP, SERVER_PORT);
-        System.err.println("Socket created");
+        System.err.println("Need to send "+msg+", Socket created");
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
 
         System.err.println("Write message: "+msg);
@@ -79,6 +82,7 @@ public class Main {
         br.close();
         bw.close();
         s.close();
+        System.err.println("SingleMessage will return "+job);
         return job;
     }
 
@@ -101,7 +105,9 @@ public class Main {
             out.println(msg);
             String resp = null;
             try {
+                System.err.println("Waiting for answer from displayApp");
                 resp = in.readLine();
+                System.err.println("Got answer from displayApp: "+resp);
             } catch (IOException e) {
                 e.printStackTrace();
             }

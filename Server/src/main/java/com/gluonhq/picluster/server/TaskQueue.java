@@ -24,11 +24,13 @@ public class TaskQueue {
     }
 
     static Task getAvailableTask (boolean blocking) {
-        Optional<Task> opt = queue.stream().filter(t -> !t.processing).findFirst();
-        if (opt.isPresent()) {
-            Task candidate = opt.get();
-            candidate.processing = true;
-            return candidate;
+        synchronized (queue) {
+            Optional<Task> opt = queue.stream().filter(t -> !t.processing).findFirst();
+            if (opt.isPresent()) {
+                Task candidate = opt.get();
+                candidate.processing = true;
+                return candidate;
+            }
         }
         if (blocking) {
             try {

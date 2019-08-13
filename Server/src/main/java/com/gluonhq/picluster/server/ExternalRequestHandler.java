@@ -51,11 +51,11 @@ public class ExternalRequestHandler {
             }
             String response = "We're done, answer = ";
             if (task.latch.getCount() == 0) {
-                logger.info("Got answer: "+task.answer);
+                logger.info("Got answer: "+task.answer+"\n");
                 response = response + task.answer;
             } else {
                 System.err.println("Got no answer");
-                response = response + "TIMEOUT";
+                response = response + "TIMEOUT\n";
             }
             exchange.sendResponseHeaders(200, response.length());
             OutputStream os = exchange.getResponseBody();

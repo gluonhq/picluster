@@ -32,17 +32,27 @@ public class Service {
                 run = true;
                 while (run) {
                     clientSocket = serverSocket.accept();
-                    out = new PrintWriter(clientSocket.getOutputStream(), true);
-                    in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                    String message;
-                    while ((message = in.readLine()) != null) {
-                        out.println("Server: " + message);
+                    Thread clientThread = new Thread() {
+                        @Override
+                        public void run() {
+                            try {
+                                out = new PrintWriter(clientSocket.getOutputStream(), true);
+                                in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                                String message;
+                                while ((message = in.readLine()) != null) {
+                                    out.println("Server: " + message);
 //                        System.out.println("chunk = " + message);
-                        Chunk chunk = Chunk.parseChunk(message);
-                        if (chunk != null) {
-                            consumer.accept(chunk);
+                                    Chunk chunk = Chunk.parseChunk(message);
+                                    if (chunk != null) {
+                                        consumer.accept(chunk);
+                                    }
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                         }
-                    }
+                    };
+                    clientThread.start();
                 }
             } catch (SocketException s) {
                 System.out.println("Error: " + s);
