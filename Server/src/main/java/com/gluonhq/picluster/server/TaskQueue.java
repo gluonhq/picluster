@@ -2,6 +2,8 @@ package com.gluonhq.picluster.server;
 
 import java.util.LinkedList;
 import java.util.Optional;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class TaskQueue {
@@ -49,6 +51,19 @@ public class TaskQueue {
             }
         }
         return null;
+    }
+
+    /**
+     * A task was delegated to a worker, but he couldn't work on it, so it
+     * moves back to the queue.
+     * We need to set the processing flag to false, and notify waiters
+     * @param task
+     */
+    static void pushBack(Task task) {
+        task.processing = false;
+        synchronized (queue) {
+            queue.notifyAll();
+        }
     }
 
     static Task getTaskById(String id) {

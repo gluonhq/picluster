@@ -53,6 +53,7 @@ public class DeviceListener {
                     proxy.establish(IP);
                     proxy.processIncomingMessages(IP);
                 } catch (IOException e) {
+                    e.printStackTrace();
                     try {
                         s.close();
                     } catch (IOException e1) {
@@ -100,7 +101,7 @@ public class DeviceListener {
             logger.fine("Got request from worker: " + request);
 
             processMessage(id, request);
-
+            System.err.println("DONE processing incoming messages");
         }
 
 
@@ -113,13 +114,21 @@ public class DeviceListener {
             // CHECK if this ID matches the proxy ID and fail big time if not
 
             if (cmd.equals("ask")) {
-                logger.fine("Wait for available task");
+                logger.info("Wait for available task: "+id);
                 Task task = TaskQueue.getAvailableTask(true);
-                logger.fine("Got available task");
+                logger.info("Got available task: "+id);
                 String answer = task.id + SEP + task.url + "\n";
                 bw.write(answer);
                 bw.flush();
-                logger.finer("Wrote id + url to worker: " + answer);
+                os.flush();
+                int ack = br.read();
+                System.err.println("got ack: "+ack);
+                if (ack == -1) {
+                    TaskQueue.pushBack(task);
+                    System.err.println("Pushback, return");
+                    return;
+                }
+                logger.info("Wrote id + url to worker: " + answer);
             }
             if (cmd.equals("answer")) {
                 int idx3 = status.indexOf(SEP, idx2 + 1);
