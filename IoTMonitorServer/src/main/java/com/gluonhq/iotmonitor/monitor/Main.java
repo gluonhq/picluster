@@ -13,6 +13,8 @@ import java.util.Optional;
 
 public class Main extends Application {
 
+    static boolean TEST_MODE = false;
+
     private FlowPane flowPane;
 
     private DataReader dr;

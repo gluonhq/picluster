@@ -11,6 +11,9 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Random;
+
+import static com.gluonhq.iotmonitor.monitor.Main.TEST_MODE;
 
 public class DataReader {
 
@@ -119,7 +122,12 @@ public class DataReader {
 //                System.err.println("Value = " + v);
                 Platform.runLater(() -> {
                     Node node = Model.getNodeById(id);
-                    node.getStat().cpu.set(v);
+                    if (TEST_MODE) {
+                        node.getStat().cpu.set(new Random().nextDouble() * 100);
+                        node.getStat().mem.set(new Random().nextDouble() * 100);
+                    } else {
+                        node.getStat().cpu.set(v);
+                    }
                     node.lastPing().set(System.nanoTime());
                 });
             }
