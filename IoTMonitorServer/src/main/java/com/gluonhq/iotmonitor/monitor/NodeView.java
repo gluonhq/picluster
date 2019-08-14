@@ -4,6 +4,7 @@ import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.TileBuilder;
 import eu.hansolo.tilesfx.colors.Bright;
+import javafx.css.PseudoClass;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -18,7 +19,18 @@ import javafx.scene.text.Font;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material.Material;
 
+import java.util.List;
+
+import static com.gluonhq.iotmonitor.monitor.Main.TEST_MODE;
+
 public class NodeView extends Region {
+
+    private static final int HIGH_THRESHOLD   = TEST_MODE ? 7 : 20;
+    private static final int MEDIUM_THRESHOLD = TEST_MODE ? 3 : 10;
+    private static final PseudoClass PSEUDO_CLASS_LOW    = PseudoClass.getPseudoClass("low"); 
+    private static final PseudoClass PSEUDO_CLASS_MEDIUM = PseudoClass.getPseudoClass("medium"); 
+    private static final PseudoClass PSEUDO_CLASS_HIGH   = PseudoClass.getPseudoClass("high");
+    private List<PseudoClass> states = List.of(PSEUDO_CLASS_LOW, PSEUDO_CLASS_MEDIUM, PSEUDO_CLASS_HIGH);
 
     private Node node;
 
@@ -61,11 +73,17 @@ public class NodeView extends Region {
     }
 
     private void createUI() {
-        HBox upperBox = new HBox(4, cpuView, memView);
+        HBox upperBox = new HBox(cpuView, memView);
+        upperBox.getStyleClass().add("upper-box");
+
         StackPane elapsedPane = new StackPane(elapsedTimeView);
+        elapsedPane.getStyleClass().add("elapsed-pane");
         HBox.setHgrow(elapsedPane, Priority.ALWAYS);
-        HBox lowerBox = new HBox(4, elapsedPane, reboot);
-        VBox vbox = new VBox(4, upperBox, lowerBox);
+        HBox lowerBox = new HBox(elapsedPane, reboot);
+        lowerBox.getStyleClass().add("lower-box");
+
+        VBox vbox = new VBox(upperBox, lowerBox);
+        vbox.getStyleClass().add("container");
         reboot.setGraphic(FontIcon.of(Material.REFRESH, 20));
         reboot.setOnAction((e) -> {
             System.err.println("I have to send reboot request");
@@ -73,24 +91,27 @@ public class NodeView extends Region {
                 node.getProxy().requestReboot();
                 Model.nodeMapper.remove(node.getId());
             } else {
-                System.err.println("Could not find proxy for node "+node);
+                System.err.println("Could not find proxy for node " + node);
             }
         });
-        elapsedPane.setStyle("-fx-background-color: gray");
 
         cpuView.valueProperty().bind(node.getStat().cpu());
         memView.valueProperty().bind(node.getStat().mem());
         elapsedTimeView.textProperty().bind(node.elapsedTime().asString());
 
         node.elapsedTime().addListener((obs, ov, nv) -> {
+            elapsedPane.pseudoClassStateChanged(PSEUDO_CLASS_HIGH, false);
+            elapsedPane.pseudoClassStateChanged(PSEUDO_CLASS_MEDIUM, false);
+            elapsedPane.pseudoClassStateChanged(PSEUDO_CLASS_LOW, false);
+            
             long elapsed = nv.intValue();
-            if (elapsed > 7) {
+            if (elapsed > HIGH_THRESHOLD) {
                 // we didn't hear for 30 seconds
-                elapsedPane.setStyle("-fx-background-color: red");
-            } else if (elapsed > 3) {
-                elapsedPane.setStyle("-fx-background-color: yellow");
+                elapsedPane.pseudoClassStateChanged(PSEUDO_CLASS_HIGH, true);
+            } else if (elapsed > MEDIUM_THRESHOLD) {
+                elapsedPane.pseudoClassStateChanged(PSEUDO_CLASS_MEDIUM, true);
             } else {
-                elapsedPane.setStyle("-fx-background-color: greenyellow");
+                elapsedPane.pseudoClassStateChanged(PSEUDO_CLASS_LOW, true);
             }
         });
 

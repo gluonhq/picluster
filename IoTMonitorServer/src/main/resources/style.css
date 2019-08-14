@@ -1,0 +1,21 @@
+.container,
+.upper-box,
+.lower-box {
+    -fx-spacing: 4px;
+}
+
+.elapsed-pane {
+    -fx-background-color: gray
+}
+
+.elapsed-pane:high {
+    -fx-background-color: red;
+}
+
+.elapsed-pane:medium {
+    -fx-background-color: yellow;
+}
+
+.elapsed-pane:low {
+    -fx-background-color: yellowgreen;
+}
