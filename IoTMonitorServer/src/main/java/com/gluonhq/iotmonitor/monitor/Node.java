@@ -8,6 +8,8 @@ import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import java.util.Random;
+
 public class Node {
 
     private final Stat stat;
@@ -40,12 +42,35 @@ public class Node {
         this.id = id;
         this.stat = new Stat();
         at = new AnimationTimer() {
+
+            long lastUpdate;
+            long lastUpdatedSecond;
+
+            @Override
+            public void start() {
+                lastUpdate = System.nanoTime();
+                lastUpdatedSecond = 0;
+                super.start();
+            }
+
             @Override
             public void handle(long now) {
                 long diff = (now - lastPing.get()) / 1_000_000_000L;
                 elapsedTime.set(diff);
                 if (diff > 30) {
                     at.stop();
+                }
+
+
+                long elapsedNanoSeconds = now - lastUpdate ;
+                long elapsedSeconds = elapsedNanoSeconds / 1_000_000_000L ; // Every sec
+
+                System.out.println(elapsedSeconds);
+
+                if (elapsedSeconds > lastUpdatedSecond) {
+                    getStat().cpu.set(new Random().nextDouble() * 100);
+                    getStat().mem.set(new Random().nextDouble() * 100);
+                    lastUpdatedSecond = elapsedSeconds;
                 }
             }
         };
