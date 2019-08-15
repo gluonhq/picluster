@@ -1,3 +1,12 @@
+.info-box {
+    -fx-spacing: 4px;
+    -fx-alignment: center;
+}
+
+.info-box > .label {
+    -fx-font-size: 0.75em;
+}
+
 .container,
 .upper-box,
 .lower-box {
@@ -5,6 +14,8 @@
 }
 
 .elapsed-pane {
+    -fx-alignment: center;
+    -fx-spacing: 10;
     -fx-background-color: gray
 }
 
@@ -18,4 +29,8 @@
 
 .elapsed-pane:low {
     -fx-background-color: yellowgreen;
+}
+
+.elapsed-pane > .header {
+    -fx-font-size: 0.75em;
 }
