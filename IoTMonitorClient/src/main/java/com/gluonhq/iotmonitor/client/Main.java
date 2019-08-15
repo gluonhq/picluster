@@ -21,12 +21,16 @@ public class Main {
     private final static String HOST = TEST_MODE ? "localhost" : "192.168.68.112";
     private final static int PORT = 31415;
     private final static String SEP = ";";
-    private final static ProcessBuilder pb;
+    private final static ProcessBuilder pbCpu;
+    private final static ProcessBuilder pbMem;
 
     static {
-        pb = new ProcessBuilder( "/bin/sh", "-c");
-        pb.command().add("vmstat | awk '(NR==2){for(i=1;i<=NF;i++)if($i==\"id\"){getline; print $i}}'");
-        pb.redirectErrorStream(true);
+        pbCpu = new ProcessBuilder( "/bin/sh", "-c");
+        pbCpu.command().add("vmstat | awk '(NR==2){for(i=1;i<=NF;i++)if($i==\"id\"){getline; print $i}}'");
+        pbCpu.redirectErrorStream(true);
+        pbMem = new ProcessBuilder( "/bin/sh", "-c");
+        pbMem.command().add("vmstat -s | awk  ' $0 ~ /total memory/ {total=$1 } $0 ~/free memory/ {free=$1} $0 ~/buffer memory/ {buffer=$1} $0 ~/cache/ {cache=$1} END{print (total-free-buffer-cache)/total*100}'");
+        pbMem.redirectErrorStream(true);
     }
 
     public static void main(String[] args) {
@@ -55,7 +59,7 @@ public class Main {
                 go = false;
             }
             while (go) {
-                String msg = "ID" + SEP + "cpu" + SEP + getCpuUsage() + "\n";
+                String msg = "ID" + SEP + "cpu" + SEP + getCpuUsage() + SEP + getMemUsage() + "\n";
                 try {
                     br.write(msg);
                     br.flush();
@@ -99,12 +103,29 @@ public class Main {
     private static double getCpuUsage() {
         String answer;
         try {
-            Process p = pb.start();
+            Process p = pbCpu.start();
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
                 answer = reader.readLine();
             }
             if (p.waitFor() == 0) {
                 return 100 - Double.valueOf(answer);
+            }
+            System.out.println("Error, answer: " + answer);
+        } catch (IOException | InterruptedException | NumberFormatException ex) {
+            System.err.println("Error processing " + ex.getMessage());
+        }
+        return 0d;
+    }
+
+    private static double getMemUsage() {
+        String answer;
+        try {
+            Process p = pbMem.start();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
+                answer = reader.readLine();
+            }
+            if (p.waitFor() == 0) {
+                return Double.valueOf(answer);
             }
             System.out.println("Error, answer: " + answer);
         } catch (IOException | InterruptedException | NumberFormatException ex) {

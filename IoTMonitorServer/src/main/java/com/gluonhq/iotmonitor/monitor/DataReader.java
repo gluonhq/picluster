@@ -110,23 +110,26 @@ public class DataReader {
 
         void processMessage(String id, String status) {
             // first part is ID
-            int idx = status.indexOf(SEP);
-            int idx2 = status.indexOf(SEP, idx+1);
-            String cmd = status.substring(idx + 1, idx2);
-            System.err.println("Message for " + id + ", cmd = " + cmd);
+            String[] split = status.split(SEP);
+            if (split.length != 4) {
+                return;
+            }
+            String cmd = split[1];
+//            System.err.println("Message for " + id + ", cmd = " + cmd);
             // CHECK if this ID matches the proxy ID and fail big time if not
 
             if (cmd.equals("cpu")) {
-                String val = status.substring(idx2 + 1);
-                double v = Double.valueOf(val);
-//                System.err.println("Value = " + v);
+                double v1 = Double.valueOf(split[2]);
+                double v2 = Double.valueOf(split[3]);
+//                System.err.println("Values = " + v1 + " " + v2);
                 Platform.runLater(() -> {
                     Node node = Model.getNodeById(id);
                     if (TEST_MODE) {
                         node.getStat().cpu.set(new Random().nextDouble() * 100);
                         node.getStat().mem.set(new Random().nextDouble() * 100);
                     } else {
-                        node.getStat().cpu.set(v);
+                        node.getStat().cpu.set(v1);
+                        node.getStat().mem.set(v2);
                     }
                     node.lastPing().set(System.nanoTime());
                 });
