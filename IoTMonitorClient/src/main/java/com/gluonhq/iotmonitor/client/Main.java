@@ -16,7 +16,9 @@ import java.net.Socket;
  */
 public class Main {
 
-    private final static String HOST = "192.168.68.112";
+    private final static boolean TEST_MODE = false;
+
+    private final static String HOST = TEST_MODE ? "localhost" : "192.168.68.112";
     private final static int PORT = 31415;
     private final static String SEP = ";";
     private final static ProcessBuilder pb;
@@ -58,7 +60,7 @@ public class Main {
                     br.write(msg);
                     br.flush();
                     os.flush();
-                    Thread.sleep(10_000);
+                    Thread.sleep(TEST_MODE ? 1_000 : 10_000);
                 } catch (IOException | InterruptedException e) {
                     e.printStackTrace();
                     go = false;

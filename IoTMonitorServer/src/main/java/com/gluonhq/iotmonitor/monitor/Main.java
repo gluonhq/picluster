@@ -13,6 +13,8 @@ import java.util.Optional;
 
 public class Main extends Application {
 
+    static boolean TEST_MODE = false;
+
     private FlowPane flowPane;
 
     private DataReader dr;
@@ -28,6 +30,7 @@ public class Main extends Application {
         bp.setCenter(scrollPane);
 
         Scene scene = new Scene(bp, 640, 480);
+        scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
         stage.setScene(scene);
         stage.show();
 

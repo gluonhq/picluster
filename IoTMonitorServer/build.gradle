@@ -7,6 +7,12 @@ repositories {
     mavenCentral()
 }
 
+dependencies {
+    compile 'eu.hansolo:tilesfx:11.2'
+    compile 'org.kordamp.ikonli:ikonli-javafx:11.3.4'
+    compile 'org.kordamp.ikonli:ikonli-material-pack:11.3.4'
+}
+
 javafx {
     version = "12.0.2"
     modules = [ 'javafx.controls' ]

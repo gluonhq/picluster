@@ -1,0 +1,36 @@
+.info-box {
+    -fx-spacing: 4px;
+    -fx-alignment: center;
+}
+
+.info-box > .label {
+    -fx-font-size: 0.75em;
+}
+
+.container,
+.upper-box,
+.lower-box {
+    -fx-spacing: 4px;
+}
+
+.elapsed-pane {
+    -fx-alignment: center;
+    -fx-spacing: 10;
+    -fx-background-color: gray
+}
+
+.elapsed-pane:high {
+    -fx-background-color: red;
+}
+
+.elapsed-pane:medium {
+    -fx-background-color: yellow;
+}
+
+.elapsed-pane:low {
+    -fx-background-color: yellowgreen;
+}
+
+.elapsed-pane > .header {
+    -fx-font-size: 0.75em;
+}
