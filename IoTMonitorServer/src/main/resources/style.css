@@ -1,3 +1,9 @@
+.container {
+    -fx-padding: 10px;
+    -fx-border-width: 0 0.5px 0.5px 0;
+    -fx-border-color: gray;
+}
+
 .info-box {
     -fx-spacing: 4px;
     -fx-alignment: center;
@@ -7,7 +13,7 @@
     -fx-font-size: 0.75em;
 }
 
-.container,
+.graph-box,
 .upper-box,
 .lower-box {
     -fx-spacing: 4px;
