@@ -97,7 +97,7 @@ public class NodeView extends Region {
         lowerBox.getStyleClass().add("lower-box");
 
         VBox vbox = new VBox(upperBox, lowerBox);
-        vbox.getStyleClass().add("container");
+        vbox.getStyleClass().add("graph-box");
 
         cpuView.valueProperty().bind(node.getStat().cpu());
         memView.valueProperty().bind(node.getStat().mem());
@@ -126,6 +126,7 @@ public class NodeView extends Region {
         VBox infoBox = new VBox(idLabel, ipLabel);
         infoBox.getStyleClass().add("info-box");
         BorderPane borderPane = new BorderPane();
+        borderPane.getStyleClass().add("container");
         borderPane.setPadding(new Insets(5));
         borderPane.setCenter(vbox);
         borderPane.setTop(infoBox);
