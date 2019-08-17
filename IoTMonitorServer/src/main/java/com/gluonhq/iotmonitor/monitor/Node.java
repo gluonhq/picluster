@@ -10,6 +10,8 @@ import javafx.beans.property.StringProperty;
 
 public class Node {
 
+    static final int THRESHOLD_PING_TIME = 30;
+
     private final Stat stat;
     private double uptime;
     private final LongProperty lastPing = new SimpleLongProperty(0);

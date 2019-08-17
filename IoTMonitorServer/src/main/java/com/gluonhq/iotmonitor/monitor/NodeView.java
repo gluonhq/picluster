@@ -19,9 +19,10 @@ import javafx.scene.paint.Stop;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material.Material;
 
+import static com.gluonhq.iotmonitor.monitor.Node.THRESHOLD_PING_TIME;
+
 public class NodeView extends Region {
 
-    private static final int THRESHOLD_PING_TIME = 30;
     private static final PseudoClass PSEUDO_CLASS_DISCONNECTED = PseudoClass.getPseudoClass("disconnect"); 
 
     private Node node;

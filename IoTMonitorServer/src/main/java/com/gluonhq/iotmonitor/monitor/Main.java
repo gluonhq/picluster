@@ -20,6 +20,8 @@ import org.controlsfx.control.action.Action;
 
 import java.util.Optional;
 
+import static com.gluonhq.iotmonitor.monitor.Node.THRESHOLD_PING_TIME;
+
 public class Main extends Application {
 
     static boolean TEST_MODE = false;
@@ -80,7 +82,7 @@ public class Main extends Application {
                     return String.format("Device %s needs powercycle.\n", node.lastKnownIp().get());
                 }, node.lastKnownIp());
                 node.elapsedTime().addListener((observable, oldValue, newValue) -> {
-                    if (newValue.intValue() > 10) {
+                    if (newValue.intValue() > THRESHOLD_PING_TIME) {
                         if (!notificationPaneTexts.contains(elapsedTime.getValue())) {
                             notificationPaneTexts.add(elapsedTime.getValue());
                         }
