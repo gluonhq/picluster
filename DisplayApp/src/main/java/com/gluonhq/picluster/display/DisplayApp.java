@@ -4,10 +4,8 @@ import com.gluonhq.picluster.display.model.Chunk;
 import com.gluonhq.picluster.display.service.Service;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
@@ -16,11 +14,11 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class DisplayApp extends Application {
@@ -63,16 +61,6 @@ public class DisplayApp extends Application {
         primaryStage.setY(y);
 
         splitImage(imageView.snapshot(null, null));
-//        Button split = new Button("Start");
-//        split.setOnAction(e -> {
-//            run = ! run;
-//            if (run) {
-//                processTask();
-//            }
-//
-//        });
-//        StackPane.setAlignment(split, Pos.TOP_LEFT);
-//        imagePane.getChildren().add(split);
 
         service = new Service();
         service.start(this::processImageChunk);
@@ -98,47 +86,26 @@ public class DisplayApp extends Application {
                 ImageView imageView = new ImageView(wImage);
                 imageView.setFitWidth(width);
                 imageView.setPreserveRatio(true);
-                gridPane.add(imageView, i, j);
+
+                Rectangle cover = new Rectangle(width, height, Color.BLACK);
+                StackPane stackPane = new StackPane(imageView, cover);
+                gridPane.add(stackPane, i, j);
             }
         }
         imagePane.getChildren().setAll(new Group(gridPane));
     }
 
-    private void processTask() {
-        counter.set(-1);
-        Thread thread = new Thread(() -> {
-            long count = 0 ;
-            while (run) {
-                count++;
-                if (counter.getAndSet(count) == -1) {
-                    int chunkId_X = new Random().nextInt(SIZE_X);
-                    int chunkId_Y = new Random().nextInt(SIZE_Y);
-                    double opacity = 0.5 + (double) new Random().nextInt(SIZE) / (2d * SIZE);
-                    processImageChunk(new Chunk(chunkId_X, chunkId_Y, opacity));
-                    try {
-                        Thread.sleep(10 + new Random().nextInt(10));
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
-        thread.setDaemon(true);
-        thread.start();
-    }
-
     private void processImageChunk(Chunk chunk) {
         Platform.runLater(() -> {
             gridPane.getChildren().stream()
-                    .filter(ImageView.class::isInstance)
-                    .map(ImageView.class::cast)
+                    .filter(StackPane.class::isInstance)
+                    .map(StackPane.class::cast)
                     .filter(n -> GridPane.getColumnIndex(n) == chunk.getX() &&
                             GridPane.getRowIndex(n) == chunk.getY())
                     .findFirst()
-//                .ifPresent(n -> n.setOpacity(opacity)));
                     .ifPresent(n -> {
-                        Image newImage = processImagePixels(n.getImage(), chunk.getOpacity());
-                        n.setImage(newImage);
+                        Rectangle cover = (Rectangle) n.getChildren().get(1);
+                        cover.setOpacity(Math.max(0, cover.getOpacity() - chunk.getOpacity()));
                     });
             counter.set(-1);
         });

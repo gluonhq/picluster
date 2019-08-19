@@ -66,7 +66,7 @@ public class MainWorker {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        int answer = (int)(Math.random()*100);
+        int answer = (int)(Math.random() * 25);
         System.err.println("Processing image at "+url+" with taskId "+taskId+", result = "+answer);
         return answer;
     }
