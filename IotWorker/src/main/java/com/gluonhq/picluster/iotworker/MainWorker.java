@@ -10,7 +10,7 @@ import java.net.ConnectException;
 import java.net.Socket;
 import java.util.Random;
 
-public class Main {
+public class MainWorker {
 
     static final String ID = "ID"; // won't use
     static final String SEP = ";";
@@ -28,18 +28,22 @@ public class Main {
     public static void main(String[] args) {
         System.err.println("Hi, I'm an IoT worker");
         try {
-            runJobs();
+            if (args.length == 2) {
+                runJobs(args[0], args[1]);
+            } else {
+                runJobs(SERVER_IP, DISPLAY_IP);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
         System.err.println("SHOULD NOT REACH HERE, best to reboot!");
     }
 
-    static void runJobs() throws IOException {
+    static void runJobs(String serverIP, String displayIP) throws IOException {
         while (go) {
             System.err.println("Create socket...");
             String msg = ID+SEP+"ask"+SEP+"\n";
-            String job = sendSingleMessage(msg);
+            String job = sendSingleMessage(serverIP, msg);
 
 
             int idx = job.indexOf(SEP);
@@ -49,8 +53,8 @@ public class Main {
             int answer = processURL(taskId, url);
 
             msg = ID+SEP+"answer"+SEP+taskId+SEP+answer+"\n";
-            sendResultToDisplayApp(answer);
-            sendSingleMessage(msg);
+            sendResultToDisplayApp(displayIP, answer);
+            sendSingleMessage(serverIP, msg);
 
         }
     }
@@ -67,8 +71,8 @@ public class Main {
         return answer;
     }
 
-    static String sendSingleMessage (String msg) throws IOException {
-        Socket s = new Socket(SERVER_IP, SERVER_PORT);
+    static String sendSingleMessage (String serverIP, String msg) throws IOException {
+        Socket s = new Socket(serverIP, SERVER_PORT);
         System.err.println("Need to send "+msg+", Socket created");
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
 
@@ -95,9 +99,9 @@ public class Main {
     private static final int SIZE = 1024;
 
 
-    static void sendResultToDisplayApp(int answer) {
+    static void sendResultToDisplayApp(String displayIP, int answer) {
         try {
-            Socket clientSocket = new Socket(DISPLAY_IP, DISPLAY_PORT);
+            Socket clientSocket = new Socket(displayIP, DISPLAY_PORT);
             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
             BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             int chunkId_X = new Random().nextInt(SIZE_X);
