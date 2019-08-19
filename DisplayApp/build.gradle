@@ -1,6 +1,7 @@
 plugins {
     id 'application'
     id 'org.openjfx.javafxplugin' version '0.0.8'
+    id 'org.beryx.jlink' version '2.14.1'
 }
 
 repositories {
@@ -13,3 +14,10 @@ javafx {
 }
 
 mainClassName= "display/com.gluonhq.picluster.display.DisplayApp"
+
+jlink {
+    options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
+    launcher {
+        name = 'display'
+    }
+}

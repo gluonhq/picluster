@@ -1,7 +1,6 @@
 package com.gluonhq.picluster.display.service;
 
 import com.gluonhq.picluster.display.model.Chunk;
-import javafx.scene.Parent;
 
 import java.io.BufferedReader;
 import java.io.IOException;
