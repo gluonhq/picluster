@@ -4,6 +4,10 @@
     -fx-border-color: gray;
 }
 
+.container:disconnect {
+    -fx-background-color: #E3864C;
+}
+
 .info-box {
     -fx-spacing: 4px;
     -fx-alignment: center;
@@ -22,19 +26,6 @@
 .elapsed-pane {
     -fx-alignment: center;
     -fx-spacing: 10;
-    -fx-background-color: gray
-}
-
-.elapsed-pane:high {
-    -fx-background-color: red;
-}
-
-.elapsed-pane:medium {
-    -fx-background-color: yellow;
-}
-
-.elapsed-pane:low {
-    -fx-background-color: yellowgreen;
 }
 
 .elapsed-pane > .header {

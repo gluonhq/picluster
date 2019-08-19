@@ -19,15 +19,11 @@ import javafx.scene.paint.Stop;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material.Material;
 
-import static com.gluonhq.iotmonitor.monitor.Main.TEST_MODE;
+import static com.gluonhq.iotmonitor.monitor.Node.THRESHOLD_PING_TIME;
 
 public class NodeView extends Region {
 
-    private static final int HIGH_THRESHOLD   = TEST_MODE ? 7 : 20;
-    private static final int MEDIUM_THRESHOLD = TEST_MODE ? 3 : 10;
-    private static final PseudoClass PSEUDO_CLASS_LOW    = PseudoClass.getPseudoClass("low"); 
-    private static final PseudoClass PSEUDO_CLASS_MEDIUM = PseudoClass.getPseudoClass("medium"); 
-    private static final PseudoClass PSEUDO_CLASS_HIGH   = PseudoClass.getPseudoClass("high");
+    private static final PseudoClass PSEUDO_CLASS_DISCONNECTED = PseudoClass.getPseudoClass("disconnect"); 
 
     private Node node;
 
@@ -103,34 +99,26 @@ public class NodeView extends Region {
         memView.valueProperty().bind(node.getStat().mem());
         elapsedTime.textProperty().bind(node.elapsedTime().asString());
 
-        node.elapsedTime().addListener((obs, ov, nv) -> {
-            elapsedPane.pseudoClassStateChanged(PSEUDO_CLASS_HIGH, false);
-            elapsedPane.pseudoClassStateChanged(PSEUDO_CLASS_MEDIUM, false);
-            elapsedPane.pseudoClassStateChanged(PSEUDO_CLASS_LOW, false);
-            
-            long elapsed = nv.intValue();
-            if (elapsed > HIGH_THRESHOLD) {
-                // we didn't hear for 30 seconds
-                elapsedPane.pseudoClassStateChanged(PSEUDO_CLASS_HIGH, true);
-            } else if (elapsed > MEDIUM_THRESHOLD) {
-                elapsedPane.pseudoClassStateChanged(PSEUDO_CLASS_MEDIUM, true);
-            } else {
-                elapsedPane.pseudoClassStateChanged(PSEUDO_CLASS_LOW, true);
-            }
-        });
-
         Label ipLabel = new Label();
         ipLabel.getStyleClass().add("ip-label");
         ipLabel.textProperty().bind(Bindings.concat("Host: ").concat(node.lastKnownIp()));
         Label idLabel = new Label("ID: " + node.getId());
         VBox infoBox = new VBox(idLabel, ipLabel);
         infoBox.getStyleClass().add("info-box");
-        BorderPane borderPane = new BorderPane();
-        borderPane.getStyleClass().add("container");
-        borderPane.setPadding(new Insets(5));
-        borderPane.setCenter(vbox);
-        borderPane.setTop(infoBox);
-        this.getChildren().add(borderPane);
-    }
+        BorderPane root = new BorderPane();
+        root.getStyleClass().add("container");
+        root.setPadding(new Insets(5));
+        root.setCenter(vbox);
+        root.setTop(infoBox);
+        this.getChildren().add(root);
 
+        node.elapsedTime().addListener((obs, ov, nv) -> {
+            long elapsed = nv.intValue();
+            if (elapsed >= THRESHOLD_PING_TIME) {
+                root.pseudoClassStateChanged(PSEUDO_CLASS_DISCONNECTED, true);
+            } else {
+                root.pseudoClassStateChanged(PSEUDO_CLASS_DISCONNECTED, false);
+            }
+        });
+    }
 }
