@@ -7,3 +7,9 @@ repositories {
 }
 
 mainClassName= "com.gluonhq.picluster.server.Main"
+
+jar {
+    manifest {
+        attributes("Main-Class": "com.gluonhq.picluster.server.Main")
+    }
+}
