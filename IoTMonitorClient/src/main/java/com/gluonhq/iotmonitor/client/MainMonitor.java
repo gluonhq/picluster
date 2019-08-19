@@ -12,9 +12,9 @@ import java.net.Socket;
 /**
  * Run:
  *
- * java -XX:-UsePerfData Main.java
+ * java -XX:-UsePerfData MainMonitor.java
  */
-public class Main {
+public class MainMonitor {
 
     private final static boolean TEST_MODE = false;
 
@@ -34,16 +34,19 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        System.err.println("Hello, world");
         try {
-            talk();
+            if (args.length == 1) {
+                talk(args[0]);
+            } else {
+                talk(HOST);
+            }
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
     }
 
-    private static void talk () throws IOException, InterruptedException {
-        Socket s = new  Socket(HOST, PORT);
+    private static void talk (String host) throws IOException, InterruptedException {
+        Socket s = new  Socket(host, PORT);
 
         OutputStream os = s.getOutputStream();
         InputStream is = s.getInputStream();

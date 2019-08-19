@@ -6,4 +6,4 @@ repositories {
     mavenCentral()
 }
 
-mainClassName = 'com.gluonhq.iotmonitor.client.Main'
+mainClassName = 'com.gluonhq.iotmonitor.client.MainMonitor'
