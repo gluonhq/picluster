@@ -3,24 +3,18 @@ package com.gluonhq.iotmonitor.monitor;
 import javafx.application.Application;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.StringBinding;
-import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
-import javafx.collections.ObservableList;
+import javafx.geometry.HPos;
 import javafx.geometry.Orientation;
 import javafx.scene.Scene;
-import javafx.scene.control.ListView;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.controlsfx.control.NotificationPane;
 import org.controlsfx.control.action.Action;
 
-import java.util.Optional;
-
-import static com.gluonhq.iotmonitor.monitor.Node.THRESHOLD_PING_TIME;
+import static com.gluonhq.iotmonitor.monitor.Model.nodeMapper;
+import static com.gluonhq.iotmonitor.monitor.Model.unresponsiveNodes;
 
 public class Main extends Application {
 
@@ -40,66 +34,63 @@ public class Main extends Application {
         flowPane.prefWrapLengthProperty().bind(scrollPane.widthProperty().subtract(20));
         scrollPane.setContent(flowPane);
         bp.setCenter(scrollPane);
+        bp.setTop(setUpTopPane());
 
         notificationPane = new NotificationPane(bp);
-        ObservableList<String> notificationPaneTexts = FXCollections.observableArrayList();
-        final Action notificationAction = new Action("Show All", e -> {
-            final Scene scene = new Scene(new StackPane(new ListView<>(notificationPaneTexts)), 500, 500);
+        final Action showNotification = new Action("Show All", e -> {
+            final ListView<Node> unresponsiveNodeListView = new ListView<>(unresponsiveNodes);
+            unresponsiveNodeListView.setCellFactory(param -> new ListCell<>() {
+                @Override
+                protected void updateItem(Node item, boolean empty) {
+                    if (empty) {
+                        setText(null);
+                    } else {
+                        setText(formatTextForUnresponsiveNode(item));
+                    }
+                }
+            });
+            final Scene scene = new Scene(new StackPane(unresponsiveNodeListView), 500, 500);
             final Stage notificationStage = new Stage();
             notificationStage.setTitle("Unresponsive Devices");
             notificationStage.setScene(scene);
             notificationStage.show();
             notificationPane.hide();
         });
-        notificationPaneTexts.addListener((InvalidationListener) o -> {
-            if (notificationPaneTexts.isEmpty()) {
+        
+        unresponsiveNodes.addListener((InvalidationListener) o -> {
+            if (unresponsiveNodes.isEmpty()) {
                 notificationPane.hide();
             } else {
-                if (notificationPaneTexts.size() > 2) {
-                    notificationPane.getActions().setAll(notificationAction);
+                if (unresponsiveNodes.size() > 2) {
+                    notificationPane.getActions().setAll(showNotification);
                 }
                 notificationPane.show();
             }
         });
 
         notificationPane.textProperty().bind(Bindings.createStringBinding(() -> {
-            return notificationPaneTexts.stream().limit(2).reduce("", (s1, s2) -> s1 + s2);
-        }, notificationPaneTexts));
-        
-        notificationPane.addEventHandler(NotificationPane.ON_HIDING, e -> {
-            notificationPaneTexts.clear();
-        });
+            return unresponsiveNodes.stream().limit(2)
+                    .map(s -> formatTextForUnresponsiveNode(s))
+                    .reduce("", (s1, s2) -> s1 + s2);
+        }, unresponsiveNodes));
 
         Scene scene = new Scene(notificationPane, 640, 480);
         scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
         stage.setScene(scene);
         stage.show();
 
-        Model.nodeMapper.addListener((MapChangeListener<String, Node>) change -> {
+        nodeMapper.addListener((MapChangeListener<String, Node>) change -> {
             if (change.wasAdded()) {
                 final Node node = change.getValueAdded();
-                final StringBinding elapsedTime = Bindings.createStringBinding(() -> {
-                    return String.format("Device %s needs powercycle.\n", node.lastKnownIp().get());
-                }, node.lastKnownIp());
-                node.elapsedTime().addListener((observable, oldValue, newValue) -> {
-                    if (newValue.intValue() > THRESHOLD_PING_TIME) {
-                        if (!notificationPaneTexts.contains(elapsedTime.getValue())) {
-                            notificationPaneTexts.add(elapsedTime.getValue());
-                        }
-                    } else {
-                        notificationPaneTexts.remove(elapsedTime.getValue());
-                    }
-                });
-
                 NodeView view = new NodeView(node);
                 flowPane.getChildren().add(view);
             } else if (change.wasRemoved()) {
-                Optional<NodeView> view = flowPane.getChildren().stream()
-                        .filter(NodeView.class::isInstance)
-                        .map(NodeView.class::cast)
-                        .filter(n -> n.getNodeId().equals(change.getValueRemoved().getId()))
-                        .findFirst();
-                view.ifPresent(v -> flowPane.getChildren().remove(v));
+                flowPane.getChildren().removeIf(n -> {
+                    if (n instanceof NodeView) {
+                        return ((NodeView) n).getNodeId().equals(change.getValueRemoved().getId());
+                    }
+                    return false;
+                });
             }
         });
     }
@@ -109,7 +100,37 @@ public class Main extends Application {
         if (dr != null) {
             dr.stopReading();
         }
-        Model.nodeMapper.forEach((k, v) -> v.stop());
+        nodeMapper.forEach((k, v) -> v.stop());
+    }
+
+    private GridPane setUpTopPane() {
+        final GridPane gridPane = new GridPane();
+        gridPane.getStyleClass().add("top-pane");
+
+        final Label totalNodesLabel = new Label();
+        gridPane.add(totalNodesLabel, 0, 0);
+        GridPane.setHgrow(totalNodesLabel, Priority.ALWAYS);
+        GridPane.setHalignment(totalNodesLabel, HPos.CENTER);
+
+        final Label unresponsiveNodesLabel = new Label();
+        gridPane.add(unresponsiveNodesLabel, 1, 0);
+        GridPane.setHgrow(unresponsiveNodesLabel, Priority.ALWAYS);
+        GridPane.setHalignment(unresponsiveNodesLabel, HPos.CENTER);
+
+        final Button fixAll = new Button("Fix All");
+        fixAll.setOnAction(e -> unresponsiveNodes.clear());
+        gridPane.add(fixAll, 3, 0);
+        GridPane.setHgrow(fixAll, Priority.ALWAYS);
+        GridPane.setHalignment(fixAll, HPos.CENTER);
+
+        totalNodesLabel.textProperty().bind(Bindings.concat("Total no. of nodes: ").concat(Bindings.size(nodeMapper)));
+        unresponsiveNodesLabel.textProperty().bind(Bindings.concat("Unresponsive nodes: ").concat(Bindings.size(unresponsiveNodes)));
+
+        return gridPane;
+    }
+
+    private String formatTextForUnresponsiveNode(Node item) {
+        return String.format("Device %s needs powercycle.\n", item.lastKnownIp().get());
     }
 
 }

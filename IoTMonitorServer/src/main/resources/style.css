@@ -1,33 +1,38 @@
-.container {
+.top-pane {
+    -fx-alignment: center;
+    -fx-padding: 10 0 10 0;
+}
+
+.node-view > .container {
     -fx-padding: 10px;
     -fx-border-width: 0 0.5px 0.5px 0;
     -fx-border-color: gray;
 }
 
-.container:disconnect {
+.node-view > .container:disconnect {
     -fx-background-color: #E3864C;
 }
 
-.info-box {
+.node-view > .container > .info-box {
     -fx-spacing: 4px;
     -fx-alignment: center;
 }
 
-.info-box > .label {
+.node-view > .container > .info-box > .label {
     -fx-font-size: 0.75em;
 }
 
-.graph-box,
-.upper-box,
-.lower-box {
+.node-view > .container > .graph-box,
+.node-view > .container > .graph-box > .upper-box,
+.node-view > .container > .graph-box > .lower-box {
     -fx-spacing: 4px;
 }
 
-.elapsed-pane {
+.node-view > .container > .graph-box > .lower-box > .elapsed-pane {
     -fx-alignment: center;
     -fx-spacing: 10;
 }
 
-.elapsed-pane > .header {
+.node-view > .container > .graph-box > .lower-box > .elapsed-pane > .header {
     -fx-font-size: 0.75em;
 }

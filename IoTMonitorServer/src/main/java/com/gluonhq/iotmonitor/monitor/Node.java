@@ -1,6 +1,7 @@
 package com.gluonhq.iotmonitor.monitor;
 
 import javafx.animation.AnimationTimer;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -90,5 +91,13 @@ public class Node {
         if (at != null) {
             at.stop();
         }
+    }
+    
+    public BooleanBinding unresponsiveProperty() {
+        return elapsedTime.greaterThan(THRESHOLD_PING_TIME);
+    }
+    
+    public boolean isUnresponsive() {
+        return unresponsiveProperty().get();
     }
 }

@@ -110,7 +110,9 @@ public class NodeView extends Region {
         root.setPadding(new Insets(5));
         root.setCenter(vbox);
         root.setTop(infoBox);
-        this.getChildren().add(root);
+        
+        getStyleClass().add("node-view");
+        getChildren().add(root);
 
         node.elapsedTime().addListener((obs, ov, nv) -> {
             long elapsed = nv.intValue();
