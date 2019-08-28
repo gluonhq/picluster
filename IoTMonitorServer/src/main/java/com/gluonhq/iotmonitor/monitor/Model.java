@@ -16,8 +16,8 @@ public class Model {
     static {
         nodeMapper.addListener((MapChangeListener<String, Node>) change -> {
             AtomicReference<Node> node = new AtomicReference<>();
-            final ChangeListener<Boolean> unresponsiveListener = (o, oldValue, newValue) -> {
-                if (newValue) {
+            final ChangeListener<Number> unresponsiveListener = (o, oldValue, newValue) -> {
+                if (newValue.longValue() > Node.THRESHOLD_PING_TIME) {
                     unresponsiveNodes.add(node.get());
                 } else {
                     unresponsiveNodes.remove(node.get());
@@ -25,10 +25,10 @@ public class Model {
             };
             if (change.wasAdded()) {
                 node.set(change.getValueAdded());
-                change.getValueAdded().unresponsiveProperty().addListener(unresponsiveListener);
+                node.get().elapsedTime().addListener(unresponsiveListener);
             } else if (change.wasRemoved()) {
                 node.set(change.getValueRemoved());
-                change.getValueRemoved().unresponsiveProperty().removeListener(unresponsiveListener);
+                node.get().elapsedTime().removeListener(unresponsiveListener);
             }
         });
     }
