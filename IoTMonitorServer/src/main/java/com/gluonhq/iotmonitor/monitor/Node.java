@@ -29,14 +29,7 @@ public class Node {
     class Stat {
         DoubleProperty cpu = new SimpleDoubleProperty();
         DoubleProperty mem = new SimpleDoubleProperty();
-
-        DoubleProperty cpu() {
-            return cpu;
-        }
-
-        DoubleProperty mem() {
-            return mem;
-        }
+        DoubleProperty temp = new SimpleDoubleProperty();
     }
 
     public Node (String id) {

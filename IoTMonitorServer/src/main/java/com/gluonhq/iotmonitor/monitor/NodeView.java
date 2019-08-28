@@ -3,7 +3,9 @@ package com.gluonhq.iotmonitor.monitor;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.TileBuilder;
+import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.colors.Bright;
+import eu.hansolo.tilesfx.tools.GradientLookup;
 import javafx.beans.binding.Bindings;
 import javafx.css.PseudoClass;
 import javafx.geometry.Insets;
@@ -19,34 +21,46 @@ import javafx.scene.paint.Stop;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material.Material;
 
+import java.util.Arrays;
+
 import static com.gluonhq.iotmonitor.monitor.Node.THRESHOLD_PING_TIME;
 
 public class NodeView extends Region {
 
-    private static final PseudoClass PSEUDO_CLASS_DISCONNECTED = PseudoClass.getPseudoClass("disconnect"); 
+    private static final int TILE_WIDTH  = 100;
+    private static final int TILE_HEIGHT = 100;
+
+    private static final PseudoClass PSEUDO_CLASS_DISCONNECTED = PseudoClass.getPseudoClass("disconnect");
 
     private Node node;
 
-    private Tile cpuView = TileBuilder.create()
-            .skinType(SkinType.BAR_GAUGE)
-            .prefSize(100, 100)
-            .minValue(0)
-            .maxValue(100)
-            .startFromZero(true)
-            .title("CPU")
-            .gradientStops(new Stop(0, Bright.GREEN),
-                    new Stop(0.4, Bright.YELLOW),
-                    new Stop(0.8, Bright.RED))
-            .strokeWithGradient(true)
+    private ChartData cpuItem        = new ChartData("CPU", Bright.RED);
+    private ChartData memItem        = new ChartData("MEM", Bright.BLUE);
+    private GradientLookup gradientLookup = new GradientLookup(Arrays.asList(
+            new Stop(0.0, Bright.GREEN), 
+            new Stop(0.4, Bright.YELLOW), 
+            new Stop(0.8, Bright.RED))
+    );
+
+    private Tile cpuMemView = TileBuilder.create()
+            .skinType(SkinType.CUSTOM)
+            .prefSize(TILE_WIDTH, TILE_HEIGHT)
+            .unit("\u0025")
+            .title("RESOURCE UTILIZATION")
+            .chartData(memItem, cpuItem)
             .build();
 
-    private Tile memView = TileBuilder.create()
+    private Tile tempView = TileBuilder.create()
             .skinType(SkinType.BAR_GAUGE)
-            .prefSize(100, 100)
+            .prefSize(TILE_WIDTH, TILE_HEIGHT)
             .minValue(0)
-            .maxValue(100)
+            .maxValue(120)
+            .threshold(80)
+            .thresholdVisible(true)
             .startFromZero(true)
-            .title("MEMORY")
+            .decimals(0)
+            .title("TEMPERATURE")
+            .unit("C")
             .gradientStops(new Stop(0, Bright.GREEN),
                     new Stop(0.4, Bright.YELLOW),
                     new Stop(0.8, Bright.RED))
@@ -63,7 +77,10 @@ public class NodeView extends Region {
     }
 
     private void createUI() {
-        HBox upperBox = new HBox(cpuView, memView);
+        
+        cpuMemView.setSkin(new CpuMemTileSkin(cpuMemView));
+        
+        HBox upperBox = new HBox(cpuMemView, tempView);
         upperBox.getStyleClass().add("upper-box");
 
         Label header = new Label("Time since last ping");
@@ -95,8 +112,16 @@ public class NodeView extends Region {
         VBox vbox = new VBox(upperBox, lowerBox);
         vbox.getStyleClass().add("graph-box");
 
-        cpuView.valueProperty().bind(node.getStat().cpu());
-        memView.valueProperty().bind(node.getStat().mem());
+        node.getStat().cpu.addListener((o, ov, nv) -> {
+            cpuItem.setFillColor(gradientLookup.getColorAt(nv.doubleValue() / 100.0));
+            cpuItem.setValue(nv.doubleValue());
+        });
+        node.getStat().mem.addListener((o, ov, nv) -> {
+            memItem.setFillColor(gradientLookup.getColorAt(nv.doubleValue() / 100.0));
+            memItem.setValue(nv.doubleValue());
+        });
+        tempView.valueProperty().bind(node.getStat().temp);
+
         elapsedTime.textProperty().bind(node.elapsedTime().asString());
 
         Label ipLabel = new Label();

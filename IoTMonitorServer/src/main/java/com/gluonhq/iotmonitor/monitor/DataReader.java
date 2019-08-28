@@ -127,6 +127,7 @@ public class DataReader {
                     if (TEST_MODE) {
                         node.getStat().cpu.set(new Random().nextDouble() * 100);
                         node.getStat().mem.set(new Random().nextDouble() * 100);
+                        node.getStat().temp.set(new Random().nextDouble() * 100);
                     } else {
                         node.getStat().cpu.set(v1);
                         node.getStat().mem.set(v2);
