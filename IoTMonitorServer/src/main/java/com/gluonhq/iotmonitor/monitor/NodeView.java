@@ -72,6 +72,12 @@ public class NodeView extends Region {
         return node.getId();
     }
 
+    private Pane spacer() {
+        Pane spacer = new Pane();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        return spacer;
+    }
+
     private void createUI() {
         
         cpuMemView.setSkin(new CpuMemTileSkin(cpuMemView));
@@ -91,7 +97,7 @@ public class NodeView extends Region {
 
         Button reboot = new Button();
         reboot.setTooltip(new Tooltip("Reboot"));
-        reboot.setGraphic(FontIcon.of(Material.REFRESH, 20));
+        reboot.setGraphic(FontIcon.of(Material.SYNC, 18));
         reboot.setOnAction((e) -> {
             System.err.println("I have to send reboot request");
             if (node.getProxy() != null) {
@@ -102,7 +108,7 @@ public class NodeView extends Region {
             }
         });
         
-        HBox lowerBox = new HBox(elapsedPane, reboot);
+       HBox lowerBox = new HBox(elapsedPane, spacer(), reboot);
         lowerBox.getStyleClass().add("lower-box");
 
         VBox vbox = new VBox(upperBox, lowerBox);
@@ -122,13 +128,9 @@ public class NodeView extends Region {
 
         Label ipLabel = new Label();
         ipLabel.getStyleClass().add("ip-label");
-        //ipLabel.textProperty().bind(Bindings.concat("Host: ").concat(node.lastKnownIp()));
         ipLabel.textProperty().bind(node.lastKnownIp());
-//        Label idLabel = new Label("ID: " + node.getId());
         Label idLabel = new Label(node.getId());
-        Pane spacer = new Pane();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-        HBox infoBox = new HBox(idLabel, spacer, ipLabel);
+        HBox infoBox = new HBox(idLabel, spacer(), ipLabel);
         infoBox.getStyleClass().add("info-box");
 
         Insets insets = new Insets(2);

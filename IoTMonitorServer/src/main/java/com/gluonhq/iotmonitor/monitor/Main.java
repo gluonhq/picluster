@@ -6,19 +6,24 @@ import javafx.beans.binding.Bindings;
 import javafx.collections.MapChangeListener;
 import javafx.geometry.HPos;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.controlsfx.control.NotificationPane;
 import org.controlsfx.control.action.Action;
+import javafx.geometry.Insets;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.material.Material;
+import javafx.scene.control.Tooltip;
 
 import static com.gluonhq.iotmonitor.monitor.Model.nodeMapper;
 import static com.gluonhq.iotmonitor.monitor.Model.unresponsiveNodes;
 
 public class Main extends Application {
 
-    static boolean TEST_MODE = true;
+    static boolean TEST_MODE = false;
 
     private NotificationPane notificationPane;
     private FlowPane flowPane;
@@ -30,6 +35,9 @@ public class Main extends Application {
         dr.startReading();
         BorderPane bp = new BorderPane();
         flowPane = new FlowPane(Orientation.HORIZONTAL);
+        flowPane.setPadding(new Insets(5));
+        flowPane.setHgap(5);
+        flowPane.setVgap(5);
         ScrollPane scrollPane = new ScrollPane();
         flowPane.prefWrapLengthProperty().bind(scrollPane.widthProperty().subtract(20));
         scrollPane.setContent(flowPane);
@@ -108,23 +116,36 @@ public class Main extends Application {
         gridPane.getStyleClass().add("top-pane");
 
         final Label totalNodesLabel = new Label();
-        gridPane.add(totalNodesLabel, 0, 0);
-        GridPane.setHgrow(totalNodesLabel, Priority.ALWAYS);
-        GridPane.setHalignment(totalNodesLabel, HPos.CENTER);
+        totalNodesLabel.setStyle("-fx-font-size: 3em");
+        final Label totalNodesTitle = new Label("Total\nNodes");
+        totalNodesTitle.setStyle("-fx-font-size: .9em");
+        HBox totalNodesCounter = new HBox( 10, totalNodesLabel, totalNodesTitle );
+        totalNodesCounter.setAlignment(Pos.CENTER);
+        gridPane.add(totalNodesCounter, 0, 0);
+        GridPane.setHgrow(totalNodesCounter, Priority.ALWAYS);
+        GridPane.setHalignment(totalNodesCounter, HPos.CENTER);
 
         final Label unresponsiveNodesLabel = new Label();
-        gridPane.add(unresponsiveNodesLabel, 1, 0);
-        GridPane.setHgrow(unresponsiveNodesLabel, Priority.ALWAYS);
-        GridPane.setHalignment(unresponsiveNodesLabel, HPos.CENTER);
+        unresponsiveNodesLabel.setStyle("-fx-font-size: 3em");
+        final Label unresponsiveNodesTitle = new Label("Unresponsive\nnodes");
+        unresponsiveNodesTitle.setStyle("-fx-font-size: .9em");
+        HBox unresponsiveNodesCounter = new HBox( 10, unresponsiveNodesLabel, unresponsiveNodesTitle );
+        unresponsiveNodesCounter.setAlignment(Pos.CENTER);
+        unresponsiveNodesCounter.setStyle("-fx-font-size: .9em");
+        gridPane.add(unresponsiveNodesCounter, 1, 0);
+        GridPane.setHgrow(unresponsiveNodesCounter, Priority.ALWAYS);
+        GridPane.setHalignment(unresponsiveNodesCounter, HPos.CENTER);
 
         final Button fixAll = new Button("Fix All");
+        fixAll.setGraphic(FontIcon.of(Material.FLASH_ON, 18));
+
         fixAll.setOnAction(e -> unresponsiveNodes.clear());
         gridPane.add(fixAll, 3, 0);
         GridPane.setHgrow(fixAll, Priority.ALWAYS);
         GridPane.setHalignment(fixAll, HPos.CENTER);
 
-        totalNodesLabel.textProperty().bind(Bindings.concat("Total no. of nodes: ").concat(Bindings.size(nodeMapper)));
-        unresponsiveNodesLabel.textProperty().bind(Bindings.concat("Unresponsive nodes: ").concat(Bindings.size(unresponsiveNodes)));
+        totalNodesLabel.textProperty().bind(Bindings.concat("").concat(Bindings.size(nodeMapper)));
+        unresponsiveNodesLabel.textProperty().bind(Bindings.concat("").concat(Bindings.size(unresponsiveNodes)));
 
         return gridPane;
     }
