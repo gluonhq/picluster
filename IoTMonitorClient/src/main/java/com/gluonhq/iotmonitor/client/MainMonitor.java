@@ -111,7 +111,7 @@ public class MainMonitor {
                 answer = reader.readLine();
             }
             if (p.waitFor() == 0) {
-                return 100 - Double.valueOf(answer);
+                return 100 - Double.parseDouble(answer);
             }
             System.out.println("Error, answer: " + answer);
         } catch (IOException | InterruptedException | NumberFormatException ex) {
@@ -128,7 +128,7 @@ public class MainMonitor {
                 answer = reader.readLine();
             }
             if (p.waitFor() == 0) {
-                return Double.valueOf(answer);
+                return Double.parseDouble(answer);
             }
             System.out.println("Error, answer: " + answer);
         } catch (IOException | InterruptedException | NumberFormatException ex) {

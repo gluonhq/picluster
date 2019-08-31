@@ -119,8 +119,8 @@ public class DataReader {
             // CHECK if this ID matches the proxy ID and fail big time if not
 
             if (cmd.equals("cpu")) {
-                double v1 = Double.valueOf(split[2]);
-                double v2 = Double.valueOf(split[3]);
+                double v1 = Double.parseDouble(split[2]);
+                double v2 = Double.parseDouble(split[3]);
 //                System.err.println("Values = " + v1 + " " + v2);
                 Platform.runLater(() -> {
                     Node node = Model.getNodeById(id);
