@@ -16,7 +16,7 @@ import java.net.Socket;
  */
 public class MainMonitor {
 
-    private final static boolean TEST_MODE = false;
+    private final static boolean TEST_MODE = true;
 
     private final static String HOST = TEST_MODE ? "localhost" : "192.168.68.112";
     private final static int PORT = 31415;

@@ -12,11 +12,7 @@ import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Stop;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material.Material;
@@ -126,15 +122,24 @@ public class NodeView extends Region {
 
         Label ipLabel = new Label();
         ipLabel.getStyleClass().add("ip-label");
-        ipLabel.textProperty().bind(Bindings.concat("Host: ").concat(node.lastKnownIp()));
-        Label idLabel = new Label("ID: " + node.getId());
-        VBox infoBox = new VBox(idLabel, ipLabel);
+        //ipLabel.textProperty().bind(Bindings.concat("Host: ").concat(node.lastKnownIp()));
+        ipLabel.textProperty().bind(node.lastKnownIp());
+//        Label idLabel = new Label("ID: " + node.getId());
+        Label idLabel = new Label(node.getId());
+        Pane spacer = new Pane();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        HBox infoBox = new HBox(idLabel, spacer, ipLabel);
         infoBox.getStyleClass().add("info-box");
+
+        Insets insets = new Insets(2);
+
         BorderPane root = new BorderPane();
         root.getStyleClass().add("container");
-        root.setPadding(new Insets(5));
+        root.setPadding(new Insets(2));
         root.setCenter(vbox);
         root.setTop(infoBox);
+        BorderPane.setMargin( vbox, insets);
+        BorderPane.setMargin( infoBox, insets);
         
         getStyleClass().add("node-view");
         getChildren().add(root);

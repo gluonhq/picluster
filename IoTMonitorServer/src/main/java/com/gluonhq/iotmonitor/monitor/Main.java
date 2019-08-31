@@ -18,7 +18,7 @@ import static com.gluonhq.iotmonitor.monitor.Model.unresponsiveNodes;
 
 public class Main extends Application {
 
-    static boolean TEST_MODE = false;
+    static boolean TEST_MODE = true;
 
     private NotificationPane notificationPane;
     private FlowPane flowPane;
