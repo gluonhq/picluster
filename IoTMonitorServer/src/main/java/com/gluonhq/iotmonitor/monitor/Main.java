@@ -22,7 +22,7 @@ import static com.gluonhq.iotmonitor.monitor.Model.unresponsiveNodes;
 
 public class Main extends Application {
 
-    static boolean TEST_MODE = false;
+    static boolean TEST_MODE = "test".equalsIgnoreCase(System.getenv("picluster_mode"));
 
     private NotificationPane notificationPane;
     private FlowPane flowPane;

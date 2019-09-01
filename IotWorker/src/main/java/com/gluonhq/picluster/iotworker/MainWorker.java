@@ -12,7 +12,7 @@ import java.util.Random;
 
 public class MainWorker {
 
-    private final static boolean TEST_MODE = false;
+    private final static boolean TEST_MODE = "test".equalsIgnoreCase(System.getenv("picluster_mode"));
 
     static final String ID = "ID"; // won't use
     static final String SEP = ";";
