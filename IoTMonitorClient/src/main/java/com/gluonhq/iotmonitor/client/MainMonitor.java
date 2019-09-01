@@ -40,12 +40,12 @@ public class MainMonitor {
             } else {
                 talk(HOST);
             }
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private static void talk (String host) throws IOException, InterruptedException {
+    private static void talk (String host) throws IOException {
         Socket s = new  Socket(host, PORT);
 
         OutputStream os = s.getOutputStream();

@@ -6,7 +6,6 @@ import eu.hansolo.tilesfx.TileBuilder;
 import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.colors.Bright;
 import eu.hansolo.tilesfx.tools.GradientLookup;
-import javafx.beans.binding.Bindings;
 import javafx.css.PseudoClass;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
@@ -21,7 +20,7 @@ import java.util.Arrays;
 
 import static com.gluonhq.iotmonitor.monitor.Node.THRESHOLD_PING_TIME;
 
-public class NodeView extends Region {
+class NodeView extends Region {
 
     private static final int TILE_WIDTH  = 100;
     private static final int TILE_HEIGHT = 100;
@@ -63,12 +62,12 @@ public class NodeView extends Region {
             .strokeWithGradient(true)
             .build();
 
-    public NodeView(Node node){
+    NodeView(Node node){
         this.node = node;
         createUI();
     }
 
-    public String getNodeId() {
+    String getNodeId() {
         return node.getId();
     }
 

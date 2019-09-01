@@ -19,7 +19,7 @@ public class DataReader {
 
     private static final int PORT = 31415;
     private boolean accepting;
-    private String SEP = ";";
+    private static String SEP = ";";
 
     public void startReading()  {
         accepting = true;
