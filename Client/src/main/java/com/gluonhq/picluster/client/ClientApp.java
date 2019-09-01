@@ -3,7 +3,7 @@ package com.gluonhq.picluster.client;
 import java.util.Random;
 
 public class ClientApp {
-    private final static boolean TEST_MODE = false;
+    private final static boolean TEST_MODE = "test".equalsIgnoreCase(System.getenv("picluster_mode"));
     static final String SERVER_IP = TEST_MODE ? "127.0.0.1" : "192.168.68.107";
 
     static volatile boolean run = true;
