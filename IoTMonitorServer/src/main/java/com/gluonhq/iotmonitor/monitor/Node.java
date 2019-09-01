@@ -25,7 +25,7 @@ public class Node {
     // proxy.id SHOULD match this.id
     private DataReader.NodeProxy proxy;
 
-    class Stat {
+    static class Stat {
         DoubleProperty cpu = new SimpleDoubleProperty();
         DoubleProperty mem = new SimpleDoubleProperty();
         DoubleProperty temp = new SimpleDoubleProperty();

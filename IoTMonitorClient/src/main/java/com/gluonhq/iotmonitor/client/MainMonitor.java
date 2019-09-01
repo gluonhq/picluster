@@ -41,12 +41,12 @@ public class MainMonitor {
             } else {
                 talk(HOST);
             }
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private static void talk (String host) throws IOException, InterruptedException {
+    private static void talk (String host) throws IOException {
         Socket s = new  Socket(host, PORT);
 
         OutputStream os = s.getOutputStream();
@@ -115,7 +115,7 @@ public class MainMonitor {
                 answer = reader.readLine();
             }
             if (p.waitFor() == 0) {
-                return 100 - Double.valueOf(answer);
+                return 100 - Double.parseDouble(answer);
             }
             System.out.println("Error, answer: " + answer);
         } catch (IOException | InterruptedException | NumberFormatException ex) {
@@ -135,7 +135,7 @@ public class MainMonitor {
                 answer = reader.readLine();
             }
             if (p.waitFor() == 0) {
-                return Double.valueOf(answer);
+                return Double.parseDouble(answer);
             }
             System.out.println("Error, answer: " + answer);
         } catch (IOException | InterruptedException | NumberFormatException ex) {

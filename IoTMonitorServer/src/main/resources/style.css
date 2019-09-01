@@ -1,12 +1,23 @@
+@import "scroll-pane.css"
+
+.root {
+    -fx-background-color: white;
+}
+
 .top-pane {
+    -fx-background-color: white;
     -fx-alignment: center;
-    -fx-padding: 10 0 10 0;
+    -fx-padding: 10 5 7 5;
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color: #c9c9c9;
 }
 
 .node-view > .container {
-    -fx-padding: 10px;
-    -fx-border-width: 0 0.5px 0.5px 0;
-    -fx-border-color: gray;
+    -fx-padding: 5px;
+    /* -fx-border-width: 0 0.5px 0.5px 0;
+    -fx-border-color: gray; */
+    -fx-background-color: #e8e8e8;
+    -fx-background-radius: 5;
 }
 
 .node-view > .container:disconnect {
@@ -15,11 +26,12 @@
 
 .node-view > .container > .info-box {
     -fx-spacing: 4px;
-    -fx-alignment: center;
+    -fx-alignment: center-left;
 }
 
 .node-view > .container > .info-box > .label {
-    -fx-font-size: 0.75em;
+    -fx-font-size: 0.8em;
+    -fx-font-weight: bold;
 }
 
 .node-view > .container > .graph-box,
@@ -29,10 +41,23 @@
 }
 
 .node-view > .container > .graph-box > .lower-box > .elapsed-pane {
-    -fx-alignment: center;
-    -fx-spacing: 10;
+    -fx-alignment: center-left;
+    -fx-spacing: 5;
 }
 
 .node-view > .container > .graph-box > .lower-box > .elapsed-pane > .header {
     -fx-font-size: 0.75em;
+}
+
+.button {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-background-radius: 3;
+    -fx-padding: 3;
+}
+
+.button:hover,
+.button:armed  {
+    -fx-background-color: #c8c8c8;
 }

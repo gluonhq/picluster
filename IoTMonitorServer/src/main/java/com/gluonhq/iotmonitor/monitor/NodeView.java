@@ -6,17 +6,12 @@ import eu.hansolo.tilesfx.TileBuilder;
 import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.colors.Bright;
 import eu.hansolo.tilesfx.tools.GradientLookup;
-import javafx.beans.binding.Bindings;
 import javafx.css.PseudoClass;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Stop;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material.Material;
@@ -25,7 +20,7 @@ import java.util.Arrays;
 
 import static com.gluonhq.iotmonitor.monitor.Node.THRESHOLD_PING_TIME;
 
-public class NodeView extends Region {
+class NodeView extends Region {
 
     private static final int TILE_WIDTH  = 100;
     private static final int TILE_HEIGHT = 100;
@@ -67,13 +62,19 @@ public class NodeView extends Region {
             .strokeWithGradient(true)
             .build();
 
-    public NodeView(Node node){
+    NodeView(Node node){
         this.node = node;
         createUI();
     }
 
-    public String getNodeId() {
+    String getNodeId() {
         return node.getId();
+    }
+
+    private Pane spacer() {
+        Pane spacer = new Pane();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        return spacer;
     }
 
     private void createUI() {
@@ -95,7 +96,7 @@ public class NodeView extends Region {
 
         Button reboot = new Button();
         reboot.setTooltip(new Tooltip("Reboot"));
-        reboot.setGraphic(FontIcon.of(Material.REFRESH, 20));
+        reboot.setGraphic(FontIcon.of(Material.SYNC, 18));
         reboot.setOnAction((e) -> {
             System.err.println("I have to send reboot request");
             if (node.getProxy() != null) {
@@ -106,7 +107,7 @@ public class NodeView extends Region {
             }
         });
         
-        HBox lowerBox = new HBox(elapsedPane, reboot);
+       HBox lowerBox = new HBox(elapsedPane, spacer(), reboot);
         lowerBox.getStyleClass().add("lower-box");
 
         VBox vbox = new VBox(upperBox, lowerBox);
@@ -126,15 +127,20 @@ public class NodeView extends Region {
 
         Label ipLabel = new Label();
         ipLabel.getStyleClass().add("ip-label");
-        ipLabel.textProperty().bind(Bindings.concat("Host: ").concat(node.lastKnownIp()));
-        Label idLabel = new Label("ID: " + node.getId());
-        VBox infoBox = new VBox(idLabel, ipLabel);
+        ipLabel.textProperty().bind(node.lastKnownIp());
+        Label idLabel = new Label(node.getId());
+        HBox infoBox = new HBox(idLabel, spacer(), ipLabel);
         infoBox.getStyleClass().add("info-box");
+
+        Insets insets = new Insets(2);
+
         BorderPane root = new BorderPane();
         root.getStyleClass().add("container");
-        root.setPadding(new Insets(5));
+        root.setPadding(new Insets(2));
         root.setCenter(vbox);
         root.setTop(infoBox);
+        BorderPane.setMargin( vbox, insets);
+        BorderPane.setMargin( infoBox, insets);
         
         getStyleClass().add("node-view");
         getChildren().add(root);
