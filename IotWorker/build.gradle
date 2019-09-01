@@ -6,4 +6,4 @@ repositories {
     mavenCentral()
 }
 
-mainClassName= "com.gluonhq.picluster.iotworker.Main"
+mainClassName= "com.gluonhq.picluster.iotworker.MainWorker"

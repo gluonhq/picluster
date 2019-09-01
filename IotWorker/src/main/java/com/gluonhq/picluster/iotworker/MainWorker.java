@@ -12,15 +12,15 @@ import java.util.Random;
 
 public class MainWorker {
 
+    private final static boolean TEST_MODE = false;
+
     static final String ID = "ID"; // won't use
     static final String SEP = ";";
 
-    static final String SERVER_IP = "192.168.68.107";
-    // static final String SERVER_IP = "127.0.0.1";
+    static final String SERVER_IP = TEST_MODE ? "127.0.0.1" : "192.168.68.107";
     static final int SERVER_PORT = 39265;
 
-    static final String DISPLAY_IP = "192.168.68.112";
-    // static final String DISPLAY_IP = "127.0.0.1";
+    static final String DISPLAY_IP =  TEST_MODE ? "127.0.0.1" : "192.168.68.112";
     static final int DISPLAY_PORT = 6666;
 
     static boolean go = true;

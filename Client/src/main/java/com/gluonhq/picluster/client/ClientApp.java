@@ -3,6 +3,9 @@ package com.gluonhq.picluster.client;
 import java.util.Random;
 
 public class ClientApp {
+    private final static boolean TEST_MODE = false;
+    static final String SERVER_IP = TEST_MODE ? "127.0.0.1" : "192.168.68.107";
+
     static volatile boolean run = true;
 
     public void startConnection(String ip, int port) {
@@ -32,7 +35,7 @@ public class ClientApp {
                 e.printStackTrace();
             }
         }));
-        String ip = args.length == 1 ? args[0] : "192.168.68.107";
+        String ip = args.length == 1 ? args[0] : SERVER_IP;
         client.startConnection(ip, 8080);
     }
 }
