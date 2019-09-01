@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.util.Random;
 
 /**
  * Run:
@@ -104,6 +105,9 @@ public class MainMonitor {
     }
 
     private static double getCpuUsage() {
+        if (TEST_MODE) {
+            return new Random().nextDouble() * 100;
+        }
         String answer;
         try {
             Process p = pbCpu.start();
@@ -121,6 +125,9 @@ public class MainMonitor {
     }
 
     private static double getMemUsage() {
+        if (TEST_MODE) {
+            return new Random().nextDouble() * 100;
+        }
         String answer;
         try {
             Process p = pbMem.start();
