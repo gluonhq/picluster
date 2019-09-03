@@ -6,6 +6,14 @@ repositories {
     mavenCentral()
 }
 
+dependencies {
+    implementation files('lib/ojdbc8.jar')
+    implementation files('lib/ucp.jar')
+    runtime files('lib/oraclepki.jar')
+    runtime files('lib/osdt_cert.jar')
+    runtime files('lib/osdt_core.jar')
+}
+
 mainClassName= "com.gluonhq.picluster.server.Main"
 
 jar {
