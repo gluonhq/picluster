@@ -5,7 +5,9 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.URI;
@@ -14,6 +16,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 public class ExternalRequestHandler {
+
+    private final static boolean TEST_MODE = "test".equalsIgnoreCase(System.getenv("picluster_mode"));
 
     // We listen for incoming HTTP request in the form of
     // http://localhost:8080/foo?http://my.path.to/an/image.jpg
@@ -39,8 +43,23 @@ public class ExternalRequestHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
             URI uri = exchange.getRequestURI();
-            String query = uri.getQuery();
-            logger.info("Got an external request with uri "+uri+", hence query = "+query);
+            String query;
+            if (TEST_MODE) {
+                query = uri.getQuery();
+                logger.info("Got an external request with uri "+uri+", hence query = "+query);
+            } else {
+                logger.info("Got an external request with uri " + uri);
+                final byte[] buffer = new byte[4096];
+                try (final InputStream in = exchange.getRequestBody();
+                     final ByteArrayOutputStream baos = new ByteArrayOutputStream(buffer.length)) {
+                    int length;
+                    while ((length = in.read(buffer, 0, buffer.length)) >= 0) {
+                        baos.write(buffer, 0, length);
+                    }
+                    query = baos.toString();
+                }
+                logger.info("Got query = " + query);
+            }
             Task task = new Task();
             task.url = query;
             TaskQueue.add(task);
