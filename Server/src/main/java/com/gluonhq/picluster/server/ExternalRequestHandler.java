@@ -25,9 +25,14 @@ public class ExternalRequestHandler {
 
     static final int POOLSIZE = 32;
 
+    static final int TIMEOUT_SECONDS = 10;
+
     Logger logger = Logger.getLogger("ExternalRequest");
 
-    public ExternalRequestHandler() {
+    private final AutonomousDatabaseWriter autonomousDatabaseWriter;
+
+    public ExternalRequestHandler(AutonomousDatabaseWriter autonomousDatabaseWriter) {
+        this.autonomousDatabaseWriter = autonomousDatabaseWriter;
     }
 
     public void startListening() throws IOException {
@@ -63,19 +68,21 @@ public class ExternalRequestHandler {
             Task task = new Task();
             task.url = query;
             TaskQueue.add(task);
+            String finalAnswer = "TIMEOUT";
             try {
-                task.latch.await(10, TimeUnit.SECONDS);
+                if (task.latch.await(TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
+                    logger.info("Got answer: "+task.answer+"\n");
+                    finalAnswer = task.answer;
+                } else {
+                    System.err.println("Got no answer");
+                }
             } catch (InterruptedException e) {
-                System.err.println("FAILED to get response in 30 seconds");
+                System.err.println("FAILED to get response in " + TIMEOUT_SECONDS + " seconds");
+                finalAnswer = "INTERRUPT";
             }
-            String response = "We're done, answer = ";
-            if (task.latch.getCount() == 0) {
-                logger.info("Got answer: "+task.answer+"\n");
-                response = response + task.answer;
-            } else {
-                System.err.println("Got no answer");
-                response = response + "TIMEOUT\n";
-            }
+            autonomousDatabaseWriter.logClientRequestAndAnswer(task.id, task.url, finalAnswer);
+            String response = "We're done, answer = " + finalAnswer + "\n";
+
             exchange.sendResponseHeaders(200, response.length());
             OutputStream os = exchange.getResponseBody();
             os.write(response.getBytes());

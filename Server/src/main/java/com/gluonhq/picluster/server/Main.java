@@ -1,6 +1,12 @@
 package com.gluonhq.picluster.server;
 
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class Main {
+
+    private static final Logger logger = Logger.getLogger(Main.class.getName());
 
     /*
      * This is the main entrypoint for the server on Ubuntu.
@@ -22,7 +28,16 @@ public class Main {
         System.err.println("Starting main server");
         DeviceListener dl = new DeviceListener();
         dl.startListening();
-        ExternalRequestHandler ext = new ExternalRequestHandler();
+
+        AutonomousDatabaseWriter autonomousDatabaseWriter = new AutonomousDatabaseWriter(args[0], args[1]);
+        try {
+            autonomousDatabaseWriter.setupConnectionPool();
+        } catch (SQLException sql) {
+            // too bad if the connection pool to the oracle Autonomous Database could not be setup
+            logger.log(Level.SEVERE, "Failed to setup connection pool to oracle autonomous database.", sql);
+        }
+
+        ExternalRequestHandler ext = new ExternalRequestHandler(autonomousDatabaseWriter);
         ext.startListening();
     }
 
