@@ -37,8 +37,11 @@ public class MainMonitor {
     public static void main(String[] args) {
         try {
             if (args.length == 1) {
+                System.err.println("Connecting to iot server at "+args[0]);
                 talk(args[0]);
             } else {
+                System.err.println("No host provided, using default "+HOST);
+                System.err.println("Use java ... MainMonitor <hostIP> to specify a host");
                 talk(HOST);
             }
         } catch (IOException e) {
