@@ -42,13 +42,13 @@ rm -rf displayapp-win
 ./gradlew IoTMonitorClient:clean IoTMonitorClient:build
 ./gradlew IoTWorker:clean IoTWorker:build
 
-mkdir -p pimonitorbundle/class
-cp -r IoTMonitorClient/build/classes/java/main/com pimonitorbundle/class
-cp -r IoTWorker/build/classes/java/main/com pimonitorbundle/class
-sed -e "s/IP_MON_SERVER/$1/g" -e "s/IP_SERVER/$2/g" -e "s/IP_DISPLAY/$3/g" IoTMonitorClient/src/scripts/startclientmonitor.sh > pimonitorbundle/startclientmonitor.sh
-chmod +x pimonitorbundle/startclientmonitor.sh
-zip -r deploy/PiMonitor/pimonitorbundle.zip pimonitorbundle
-rm -rf pimonitorbundle
+mkdir -p pimonitorclientebundle/class
+cp -r IoTMonitorClient/build/classes/java/main/com pimonitorclientebundle/class
+cp -r IoTWorker/build/classes/java/main/com pimonitorclientebundle/class
+sed -e "s/IP_MON_SERVER/$1/g" -e "s/IP_SERVER/$2/g" -e "s/IP_DISPLAY/$3/g" IoTMonitorClient/src/scripts/startclientmonitor.sh > pimonitorclientebundle/startclientmonitor.sh
+chmod +x pimonitorclientebundle/startclientmonitor.sh
+zip -r deploy/PiMonitor/pimonitorclientebundle.zip pimonitorclientebundle
+rm -rf pimonitorclientebundle
 
 ./gradlew Server:clean Server:build
 
