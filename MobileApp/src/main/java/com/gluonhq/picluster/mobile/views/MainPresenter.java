@@ -89,6 +89,11 @@ public class MainPresenter extends GluonPresenter<Main> {
 
         main.setCenter(canvas);
 
+        numButton.setOnAction(e -> {
+            VNode n1 = createNode("0", "Number");
+            addOutputConnector(n1, "data", true);
+        });
+
         varButton.setOnAction(e -> {
             VNode n1 = createNode("a", "Variable");
             addInputConnector(n1, "data", true);
