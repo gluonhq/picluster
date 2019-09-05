@@ -54,6 +54,7 @@ rm -rf pimonitorclientebundle
 
 mkdir -p serverbundle
 cp -r Server/build/libs/Server.jar serverbundle
+cp -r Server/lib/*.jar serverbundle
 sed -e "s/DB_USER/$4/g" -e "s/DB_PASS/$5/g" Server/src/scripts/startserver.sh > serverbundle/startserver.sh
 chmod +x serverbundle/startserver.sh
 zip -r deploy/Server/serverbundle.zip serverbundle
