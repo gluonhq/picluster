@@ -2,7 +2,6 @@ package com.gluonhq.picluster.mobile.views;
 
 import com.gluonhq.charm.glisten.afterburner.GluonPresenter;
 import com.gluonhq.charm.glisten.control.AppBar;
-import com.gluonhq.charm.glisten.control.BottomNavigationButton;
 import com.gluonhq.charm.glisten.mvc.View;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 import com.gluonhq.connect.GluonObservableObject;
@@ -19,6 +18,8 @@ import com.gluonhq.picluster.mobile.views.helper.CompareFlowNodeSkin;
 import com.gluonhq.picluster.mobile.views.helper.CompareValue;
 import com.gluonhq.picluster.mobile.views.helper.DoubleFlowNodeSkin;
 import com.gluonhq.picluster.mobile.views.helper.DoubleValue;
+import com.gluonhq.picluster.mobile.views.helper.FunctionFlowNodeSkin;
+import com.gluonhq.picluster.mobile.views.helper.FunctionValue;
 import com.gluonhq.picluster.mobile.views.helper.OperatorFlowNodeSkin;
 import com.gluonhq.picluster.mobile.views.helper.OperatorValue;
 import com.gluonhq.picluster.mobile.views.helper.StringFlowNodeSkin;
@@ -33,6 +34,7 @@ import eu.mihosoft.vrl.workflow.VisualizationRequest;
 import eu.mihosoft.vrl.workflow.fx.FXValueSkinFactory;
 import eu.mihosoft.vrl.workflow.fx.ScalableContentPane;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 
 import javax.inject.Inject;
 
@@ -41,10 +43,12 @@ public class MainPresenter extends GluonPresenter<Main> {
     private final static boolean TEST_MODE = "test".equalsIgnoreCase(System.getenv("picluster_mode"));
 
     @FXML private View main;
-    @FXML private BottomNavigationButton blockFor;
-    @FXML private BottomNavigationButton blockIf;
-    @FXML private BottomNavigationButton blockVar;
-    @FXML private BottomNavigationButton blockMath;
+    @FXML private Button loopButton;
+    @FXML private Button ifButton;
+    @FXML private Button varButton;
+    @FXML private Button numButton;
+    @FXML private Button mathButton;
+    @FXML private Button functionButton;
 
     @FXML private ResourceBundle resources;
 
@@ -77,6 +81,7 @@ public class MainPresenter extends GluonPresenter<Main> {
 
         FXValueSkinFactory fXSkinFactory = new FXValueSkinFactory(canvas);
         fXSkinFactory.addSkinClassForValueType(OperatorValue.class, OperatorFlowNodeSkin.class);
+        fXSkinFactory.addSkinClassForValueType(FunctionValue.class, FunctionFlowNodeSkin.class);
         fXSkinFactory.addSkinClassForValueType(CompareValue.class, CompareFlowNodeSkin.class);
         fXSkinFactory.addSkinClassForValueType(DoubleValue.class, DoubleFlowNodeSkin.class);
         fXSkinFactory.addSkinClassForValueType(String.class, StringFlowNodeSkin.class);
@@ -84,19 +89,19 @@ public class MainPresenter extends GluonPresenter<Main> {
 
         main.setCenter(canvas);
 
-        blockVar.setOnAction(e -> {
+        varButton.setOnAction(e -> {
             VNode n1 = createNode("a", "Variable");
             addInputConnector(n1, "data", true);
             addOutputConnector(n1, "data", true);
         });
 
-        blockFor.setOnAction(e -> {
+        loopButton.setOnAction(e -> {
             VNode n1 = createNode(null, "For loop");
             addInputConnector(n1, "data", true);
             addOutputConnector(n1, "data", true);
         });
 
-        blockIf.setOnAction(e -> {
+        ifButton.setOnAction(e -> {
             VNode n1 = createNode(new CompareValue("Compare"), "Compare");
             addInputConnector(n1, "data", true);
             addInputConnector(n1, "data", false);
@@ -104,10 +109,15 @@ public class MainPresenter extends GluonPresenter<Main> {
             addOutputConnector(n1, "data", false).setLegend("FALSE");
         });
 
-        blockMath.setOnAction(e -> {
+        mathButton.setOnAction(e -> {
             VNode n1 = createNode(new OperatorValue("Operator"), "Math");
             addInputConnector(n1, "data", true);
             addInputConnector(n1, "data", false);
+            addOutputConnector(n1, "data", true);
+        });
+        functionButton.setOnAction(e -> {
+            VNode n1 = createNode(new FunctionValue("Function"), "Functions");
+            addInputConnector(n1, "data", true);
             addOutputConnector(n1, "data", true);
         });
     }
