@@ -80,7 +80,11 @@ public class ExternalRequestHandler {
                 System.err.println("FAILED to get response in " + TIMEOUT_SECONDS + " seconds");
                 finalAnswer = "INTERRUPT";
             }
-            autonomousDatabaseWriter.logClientRequestAndAnswer(task.id, task.url, finalAnswer);
+
+            if (autonomousDatabaseWriter != null) {
+                autonomousDatabaseWriter.logClientRequestAndAnswer(task.id, task.url, finalAnswer);
+            }
+
             String response = "We're done, answer = " + finalAnswer + "\n";
 
             exchange.sendResponseHeaders(200, response.length());
