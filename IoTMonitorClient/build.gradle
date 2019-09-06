@@ -6,4 +6,7 @@ repositories {
     mavenCentral()
 }
 
+sourceCompatibility = 11
+targetCompatibility = 11
+
 mainClassName = 'com.gluonhq.iotmonitor.client.MainMonitor'

@@ -14,6 +14,9 @@ dependencies {
     runtime files('lib/osdt_core.jar')
 }
 
+sourceCompatibility = 11
+targetCompatibility = 11
+
 mainClassName= "com.gluonhq.picluster.server.Main"
 
 jar {
