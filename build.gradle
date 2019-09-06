@@ -1,11 +1,11 @@
 apply plugin: 'base'
 
 
-def IP_DISPLAY = "192.168.68.161"
-def IP_MON_SERVER = "192.168.68.161"
-def IP_SERVER = "192.168.68.107"
-def DB_USER = "***"
-def DB_PASS = "***"
+def IP_DISPLAY = project.hasProperty("ip.display") ? project.getProperty("ip.display") : "127.0.0.1"
+def IP_MON_SERVER = project.hasProperty("ip.mon.server") ? project.getProperty("ip.mon.server") : "127.0.0.1"
+def IP_SERVER = project.hasProperty("ip.server") ? project.getProperty("ip.server") : "127.0.0.1"
+def DB_USER = project.hasProperty("db.user") ? project.getProperty("db.user") : "****"
+def DB_PASS = project.hasProperty("db.pass") ? project.getProperty("db.pass") : "****"
 
 task setupDependencies() {
     doFirst {
