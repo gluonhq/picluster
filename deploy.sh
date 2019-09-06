@@ -46,7 +46,7 @@ echo "Running IoTMonitorClient::build..."
 echo "Running IoTWorker::build..."
 ./gradlew IoTWorker:clean IoTWorker:build
 
-mkdir -p pimonitorclientebundle/class
+mkdir -p pimonitorclientbundle/class
 cp -r IoTMonitorClient/build/classes/java/main/com pimonitorclientbundle/class
 cp -r IoTWorker/build/classes/java/main/com pimonitorclientbundle/class
 sed -e "s/IP_MON_SERVER/$1/g" -e "s/IP_SERVER/$2/g" -e "s/IP_DISPLAY/$3/g" IoTMonitorClient/src/scripts/startclientmonitor.sh > pimonitorclientbundle/startclientmonitor.sh
