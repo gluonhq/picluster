@@ -7,107 +7,153 @@ def IP_SERVER = "192.168.68.107"
 def DB_USER = "***"
 def DB_PASS = "***"
 
-def deploy = new File("$rootDir/deploy")
-if (!deploy.exists()) {
-    deploy.mkdirs()
-}
-def deployIoTMonSrv = new File("$rootDir/deploy/IotMonitorServer")
-if (!deployIoTMonSrv.exists()) {
-    deployIoTMonSrv.mkdirs()
-}
-def deployDisplayApp = new File("$rootDir/deploy/DisplayApp")
-if (!deployDisplayApp.exists()) {
-    deployDisplayApp.mkdirs()
-}
-def deployPiMonitor = new File("$rootDir/deploy/PiMonitor")
-if (!deployPiMonitor.exists()) {
-    deployPiMonitor.mkdirs()
-}
-def deployServer = new File("$rootDir/deploy/Server")
-if (!deployServer.exists()) {
-    deployServer.mkdirs()
-}
+task setupDependencies() {
+    doFirst {
+        println "Setup dependencies. This might take a while."
+        def deploy = new File("$rootDir/deploy")
+        if (!deploy.exists()) {
+            deploy.mkdirs()
+        }
+        def deployIoTMonSrv = new File("$rootDir/deploy/IotMonitorServer")
+        if (!deployIoTMonSrv.exists()) {
+            deployIoTMonSrv.mkdirs()
+        }
+        def deployDisplayApp = new File("$rootDir/deploy/DisplayApp")
+        if (!deployDisplayApp.exists()) {
+            deployDisplayApp.mkdirs()
+        }
+        def deployPiMonitor = new File("$rootDir/deploy/PiMonitor")
+        if (!deployPiMonitor.exists()) {
+            deployPiMonitor.mkdirs()
+        }
+        def deployServer = new File("$rootDir/deploy/Server")
+        if (!deployServer.exists()) {
+            deployServer.mkdirs()
+        }
 
-def files = new File("$rootDir/files")
-if (!files.exists()) {
-    files.mkdirs()
-}
-def filesLinux = new File("$rootDir/files/filesLinux")
-if (!filesLinux.exists()) {
-    filesLinux.mkdirs()
-}
-def SDKLinux = new File("$rootDir/files/openjdk-12.0.2_linux-x64_bin.tar.gz")
-if (!SDKLinux.exists()) {
-    new URL('https://download.java.net/java/GA/jdk12.0.2/e482c34c86bd4bf8b56c0b35558996b9/10/GPL/openjdk-12.0.2_linux-x64_bin.tar.gz')
-            .withInputStream { i -> SDKLinux.withOutputStream { it << i } }
+        def files = new File("$rootDir/files")
+        if (!files.exists()) {
+            files.mkdirs()
+        }
+        def filesLinux = new File("$rootDir/files/filesLinux")
+        if (!filesLinux.exists()) {
+            filesLinux.mkdirs()
+        }
+        def SDKLinux = new File("$rootDir/files/openjdk-12.0.2_linux-x64_bin.tar.gz")
+        if (!SDKLinux.exists()) {
+            println "Downloading Linux JDK 12..."
+            new URL('https://download.java.net/java/GA/jdk12.0.2/e482c34c86bd4bf8b56c0b35558996b9/10/GPL/openjdk-12.0.2_linux-x64_bin.tar.gz')
+                    .withInputStream { i -> SDKLinux.withOutputStream { it << i } }
 
-    copy {
-        from tarTree(resources.gzip(SDKLinux))
-        into filesLinux
+            copy {
+                from tarTree(resources.gzip(SDKLinux))
+                into filesLinux
+            }
+        }
+        def ModsLinux = new File("$rootDir/files/openjfx-12.0.2_linux-x64_bin-jmods.zip")
+        if (!ModsLinux.exists()) {
+            println "Downloading Linux JavaFX 12..."
+            new URL('https://download2.gluonhq.com/openjfx/12.0.2/openjfx-12.0.2_linux-x64_bin-jmods.zip')
+                    .withInputStream { i -> ModsLinux.withOutputStream { it << i } }
+
+            copy {
+                from zipTree(ModsLinux)
+                into filesLinux
+            }
+        }
+
+        def filesMac = new File("$rootDir/files/filesMac")
+        if (!filesMac.exists()) {
+            filesMac.mkdirs()
+        }
+        def SDKMac = new File("$rootDir/files/openjdk-12.0.2_osx-x64_bin.tar.gz")
+        if (!SDKMac.exists()) {
+            println "Downloading Mac JDK 12..."
+            new URL('https://download.java.net/java/GA/jdk12.0.2/e482c34c86bd4bf8b56c0b35558996b9/10/GPL/openjdk-12.0.2_osx-x64_bin.tar.gz')
+                    .withInputStream { i -> SDKMac.withOutputStream { it << i } }
+
+            copy {
+                from tarTree(resources.gzip(SDKMac))
+                into filesMac
+            }
+        }
+        def ModsMac = new File("$rootDir/files/openjfx-12.0.2_osx-x64_bin-jmods.zip")
+        if (!ModsMac.exists()) {
+            println "Downloading Mac JavaFX 12..."
+            new URL('https://download2.gluonhq.com/openjfx/12.0.2/openjfx-12.0.2_osx-x64_bin-jmods.zip')
+                    .withInputStream { i -> ModsMac.withOutputStream { it << i } }
+
+            copy {
+                from zipTree(ModsMac)
+                into filesMac
+            }
+        }
+
+        def filesWin = new File("$rootDir/files/filesWin")
+        if (!filesWin.exists()) {
+            filesWin.mkdirs()
+        }
+
+        def SDKWin = new File("$rootDir/files/openjdk-12.0.2_windows-x64_bin.zip")
+        if (!SDKWin.exists()) {
+            println "Downloading Windows JDK 12..."
+            new URL('https://download.java.net/java/GA/jdk12.0.2/e482c34c86bd4bf8b56c0b35558996b9/10/GPL/openjdk-12.0.2_windows-x64_bin.zip')
+                    .withInputStream { i -> SDKWin.withOutputStream { it << i } }
+
+            copy {
+                from zipTree(SDKWin)
+                into filesWin
+            }
+        }
+        def ModsWin = new File("$rootDir/files/openjfx-12.0.2_windows-x64_bin-jmods.zip")
+        if (!ModsWin.exists()) {
+            println "Downloading Windows JavaFX 12..."
+            new URL('https://download2.gluonhq.com/openjfx/12.0.2/openjfx-12.0.2_windows-x64_bin-jmods.zip')
+                    .withInputStream { i -> ModsWin.withOutputStream { it << i } }
+
+            copy {
+                from zipTree(ModsWin)
+                into filesWin
+            }
+        }
+        println "Setup finished"
+        def error = 0
+        if (!SDKLinux.exists()) {
+            println "Error downloading Linux SDK 12"
+            error = error + 1
+        }
+        if (!ModsLinux.exists()) {
+            println "Error downloading Linux JavaFX 12"
+            error = error + 1
+        }
+        if (!SDKMac.exists()) {
+            println "Error downloading Mac SDK 12"
+            error = error + 1
+        }
+        if (!ModsMac.exists()) {
+            println "Error downloading Mac JavaFX 12"
+            error = error + 1
+        }
+        if (!SDKWin.exists()) {
+            println "Error downloading Windows SDK 12"
+            error = error + 1
+        }
+        if (!ModsWin.exists()) {
+            println "Error downloading Windows JavaFX 12"
+            error = error + 1
+        }
+        ext.error = error
     }
 }
-def ModsLinux = new File("$rootDir/files/openjfx-12.0.2_linux-x64_bin-jmods.zip")
-if (!ModsLinux.exists()) {
-    new URL('https://download2.gluonhq.com/openjfx/12.0.2/openjfx-12.0.2_linux-x64_bin-jmods.zip')
-            .withInputStream { i -> ModsLinux.withOutputStream { it << i } }
 
-    copy {
-        from zipTree(ModsLinux)
-        into filesLinux
+task PiDeploy(type:Exec, dependsOn: setupDependencies) {
+    doFirst {
+        if (setupDependencies.error == 0) {
+            println "Deploy Pi Cluster projects"
+            commandLine 'sh', "-c", "./deploy.sh $IP_MON_SERVER $IP_SERVER $IP_DISPLAY $DB_USER $DB_PASS"
+        } else {
+            println "There were errors during Setup: ${setupDependencies.error}"
+            commandLine 'sh', "-c", 'echo "Task failed"'
+        }
     }
-}
-
-def filesMac = new File("$rootDir/files/filesMac")
-if (!filesMac.exists()) {
-    filesMac.mkdirs()
-}
-def SDKMac = new File("$rootDir/files/openjdk-12.0.2_osx-x64_bin.tar.gz")
-if (!SDKMac.exists()) {
-    new URL('https://download.java.net/java/GA/jdk12.0.2/e482c34c86bd4bf8b56c0b35558996b9/10/GPL/openjdk-12.0.2_osx-x64_bin.tar.gz')
-            .withInputStream { i -> SDKMac.withOutputStream { it << i } }
-
-    copy {
-        from tarTree(resources.gzip(SDKMac))
-        into filesMac
-    }
-}
-def ModsMac = new File("$rootDir/files/openjfx-12.0.2_osx-x64_bin-jmods.zip")
-if (!ModsMac.exists()) {
-    new URL('https://download2.gluonhq.com/openjfx/12.0.2/openjfx-12.0.2_osx-x64_bin-jmods.zip')
-            .withInputStream { i -> ModsMac.withOutputStream { it << i } }
-
-    copy {
-        from zipTree(ModsMac)
-        into filesMac
-    }
-}
-
-def filesWin = new File("$rootDir/files/filesWin")
-if (!filesWin.exists()) {
-    filesWin.mkdirs()
-}
-
-def SDKWin = new File("$rootDir/files/openjdk-12.0.2_windows-x64_bin.zip")
-if (!SDKWin.exists()) {
-    new URL('https://download.java.net/java/GA/jdk12.0.2/e482c34c86bd4bf8b56c0b35558996b9/10/GPL/openjdk-12.0.2_windows-x64_bin.zip')
-            .withInputStream { i -> SDKWin.withOutputStream { it << i } }
-
-    copy {
-        from zipTree(SDKWin)
-        into filesWin
-    }
-}
-def ModsWin = new File("$rootDir/files/openjfx-12.0.2_windows-x64_bin-jmods.zip")
-if (!ModsWin.exists()) {
-    new URL('https://download2.gluonhq.com/openjfx/12.0.2/openjfx-12.0.2_windows-x64_bin-jmods.zip')
-            .withInputStream { i -> ModsWin.withOutputStream { it << i } }
-
-    copy {
-        from zipTree(ModsWin)
-        into filesWin
-    }
-}
-
-task PiDeploy(type:Exec) {
-    commandLine 'sh', './deploy.sh', IP_MON_SERVER, IP_SERVER, IP_DISPLAY, DB_USER, DB_PASS
 }

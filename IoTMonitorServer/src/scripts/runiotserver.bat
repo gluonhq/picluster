@@ -1,0 +1,1 @@
+call bin\iotserver.bat

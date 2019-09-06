@@ -5,41 +5,45 @@ rm -rf deploy/DisplayApp/*
 rm -rf deploy/PiMonitor/*
 rm -rf deploy/Server/*
 
+echo "Running IoTMonitorServer::jlink..."
 ./gradlew IoTMonitorServer:clean IoTMonitorServer:jlink
 
-cp IoTMonitorServer/src/script/runiotserver.sh IoTMonitorServer/build/image/iotserver-linux/runiotserver.sh
+cp IoTMonitorServer/src/scripts/runiotserver.sh IoTMonitorServer/build/image/iotserver-linux/runiotserver.sh
 mv IoTMonitorServer/build/image/iotserver-linux iotmonitorserver-linux
 zip -r deploy/IotMonitorServer/iotmonitorserver-linux.zip iotmonitorserver-linux
 rm -rf iotmonitorserver-linux
 
-cp IoTMonitorServer/src/script/runiotserver.sh IoTMonitorServer/build/image/iotserver-mac/runiotserver.sh
+cp IoTMonitorServer/src/scripts/runiotserver.sh IoTMonitorServer/build/image/iotserver-mac/runiotserver.sh
 mv IoTMonitorServer/build/image/iotserver-mac iotmonitorserver-mac
 zip -r deploy/IotMonitorServer/iotmonitorserver-mac.zip iotmonitorserver-mac
 rm -rf iotmonitorserver-mac
 
-cp IoTMonitorServer/src/script/runiotserver.sh IoTMonitorServer/build/image/iotserver-win/runiotserver.sh
+cp IoTMonitorServer/src/scripts/runiotserver.bat IoTMonitorServer/build/image/iotserver-win/runiotserver.bat
 mv IoTMonitorServer/build/image/iotserver-win iotmonitorserver-win
 zip -r deploy/IotMonitorServer/iotmonitorserver-win.zip iotmonitorserver-win
 rm -rf iotmonitorserver-win
 
+echo "Running DisplayApp::jlink..."
 ./gradlew DisplayApp:clean DisplayApp:jlink
 
-cp DisplayApp/src/script/rundisplayapp.sh DisplayApp/build/image/display-linux/rundisplayapp.sh
+cp DisplayApp/src/scripts/rundisplayapp.sh DisplayApp/build/image/display-linux/rundisplayapp.sh
 mv DisplayApp/build/image/display-linux displayapp-linux
 zip -r deploy/DisplayApp/displayapp-linux.zip displayapp-linux
 rm -rf displayapp-linux
 
-cp DisplayApp/src/script/rundisplayapp.sh DisplayApp/build/image/display-mac/rundisplayapp.sh
+cp DisplayApp/src/scripts/rundisplayapp.sh DisplayApp/build/image/display-mac/rundisplayapp.sh
 mv DisplayApp/build/image/display-mac displayapp-mac
 zip -r deploy/DisplayApp/displayapp-mac.zip displayapp-mac
 rm -rf displayapp-mac
 
-cp DisplayApp/src/script/rundisplayapp.sh DisplayApp/build/image/display-win/rundisplayapp.sh
+cp DisplayApp/src/scripts/rundisplayapp.bat DisplayApp/build/image/display-win/rundisplayapp.bat
 mv DisplayApp/build/image/display-win displayapp-win
 zip -r deploy/DisplayApp/displayapp-win.zip displayapp-win
 rm -rf displayapp-win
 
+echo "Running IoTMonitorClient::build..."
 ./gradlew IoTMonitorClient:clean IoTMonitorClient:build
+echo "Running IoTWorker::build..."
 ./gradlew IoTWorker:clean IoTWorker:build
 
 mkdir -p pimonitorclientebundle/class
@@ -50,13 +54,16 @@ chmod +x pimonitorclientebundle/startclientmonitor.sh
 zip -r deploy/PiMonitor/pimonitorclientebundle.zip pimonitorclientebundle
 rm -rf pimonitorclientebundle
 
+echo "Running Server::build..."
 ./gradlew Server:clean Server:build
 
 mkdir -p serverbundle
-cp -r Server/build/libs/Server.jar serverbundle
-cp -r Server/lib/*.jar serverbundle
+cp Server/build/libs/Server.jar serverbundle
 sed -e "s/DB_USER/$4/g" -e "s/DB_PASS/$5/g" Server/src/scripts/startserver.sh > serverbundle/startserver.sh
 chmod +x serverbundle/startserver.sh
+unzip -o Server/files/wallet.zip -d serverbundle/
 zip -r deploy/Server/serverbundle.zip serverbundle
 rm -rf serverbundle
+
+echo "Deploy done!"
 

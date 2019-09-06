@@ -1,0 +1,1 @@
+call bin\display.bat
