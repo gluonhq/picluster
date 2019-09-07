@@ -1,0 +1,11 @@
+[Unit]
+Description=Pi Client Monitor
+After=syslog.target network.target nfs-client.target remote-fs.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/sh /mnt/nfsNFS_SHARED/pimonitorclientbundle/startclientmonitor.sh
+
+[Install]
+WantedBy=multi-user.target
+

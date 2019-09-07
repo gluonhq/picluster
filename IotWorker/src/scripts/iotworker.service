@@ -1,0 +1,11 @@
+[Unit]
+Description=Pi IoT Worker
+After=syslog.target network.target nfs-client.target remote-fs.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/sh /mnt/nfsNFS_SHARED/iotworkerbundle/startiotworker.sh
+
+[Install]
+WantedBy=multi-user.target
+
