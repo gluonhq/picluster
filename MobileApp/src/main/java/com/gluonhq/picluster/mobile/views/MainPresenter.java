@@ -5,7 +5,6 @@ import com.gluonhq.charm.glisten.control.Alert;
 import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.mvc.View;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
-import com.gluonhq.connect.GluonObservableObject;
 import com.gluonhq.picluster.mobile.MainApp;
 
 import java.util.ArrayList;
@@ -43,8 +42,6 @@ import javafx.scene.control.Button;
 import javax.inject.Inject;
 
 public class MainPresenter extends GluonPresenter<MainApp> {
-
-    private final static boolean TEST_MODE = "test".equalsIgnoreCase(System.getenv("picluster_mode"));
 
     @FXML private View main;
     @FXML private Button loopButton;
@@ -217,16 +214,7 @@ public class MainPresenter extends GluonPresenter<MainApp> {
         }
         model.setBlocks(blocks);
         System.out.println("model = " + model);
-        if (TEST_MODE) {
-            try {
-                ProcessBuilder pb = new ProcessBuilder("curl", "http://127.0.0.1:8080/ID?text");
-                pb.start();
-            } catch (Exception e) {}
-        } else {
-            GluonObservableObject<String> modelGluonObservableObject = service.sendBlocks(model);
-            modelGluonObservableObject.setOnSucceeded(e -> System.out.println("sent " + e));
-            modelGluonObservableObject.exceptionProperty().addListener((obs, ov, nv) -> System.out.println("failed: " + nv));
-        }
+        service.addBlock(model);
 
         Alert alert = new Alert(javafx.scene.control.Alert.AlertType.INFORMATION,
                 resources.getString("flow.sent.text"));
