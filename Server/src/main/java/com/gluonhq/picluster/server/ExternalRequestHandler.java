@@ -1,96 +1,92 @@
 package com.gluonhq.picluster.server;
 
-import com.sun.net.httpserver.HttpContext;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpServer;
+import com.gluonhq.connect.provider.ListDataReader;
+import com.gluonhq.connect.provider.RestClient;
+import com.gluonhq.picluster.mobile.model.Model;
+import com.gluonhq.picluster.mobile.model.Wrapper;
 
-import java.io.ByteArrayOutputStream;
+import javax.json.bind.Jsonb;
+import javax.json.bind.JsonbBuilder;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.InetSocketAddress;
-import java.net.URI;
-import java.util.concurrent.Executors;
+import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 public class ExternalRequestHandler {
 
-    private final static boolean TEST_MODE = "test".equalsIgnoreCase(System.getenv("picluster_mode"));
-
-    // We listen for incoming HTTP request in the form of
-    // http://localhost:8080/foo?http://my.path.to/an/image.jpg
-    static final int PORT = 8080;
-
-    static final int POOLSIZE = 32;
+    private static final String BLOCKS = "blocks-v1";
+    private static final long DELAY =  10_000;
 
     static final int TIMEOUT_SECONDS = 10;
 
     Logger logger = Logger.getLogger("ExternalRequest");
 
     private final AutonomousDatabaseWriter autonomousDatabaseWriter;
+    private final String GLUON_SERVER_KEY;
 
-    public ExternalRequestHandler(AutonomousDatabaseWriter autonomousDatabaseWriter) {
+    public ExternalRequestHandler(AutonomousDatabaseWriter autonomousDatabaseWriter, String gluonServerKey) {
         this.autonomousDatabaseWriter = autonomousDatabaseWriter;
+
+        GLUON_SERVER_KEY = gluonServerKey;
     }
 
     public void startListening() throws IOException {
-        HttpServer server = HttpServer.create(new InetSocketAddress(PORT),0);
-        HttpContext context = server.createContext("/");
-        Handler handler = new Handler();
-        context.setHandler(handler);
-        server.setExecutor(Executors.newFixedThreadPool(POOLSIZE));
-        server.start();
-    }
+        RestClient restList = RestClient.create()
+                .method("GET")
+                .host("https://cloud.gluonhq.com")
+                .header("Authorization", "Gluon " + GLUON_SERVER_KEY)
+                .path("/3/data/enterprise/list/" + BLOCKS);
 
-    class Handler implements HttpHandler {
-        @Override
-        public void handle(HttpExchange exchange) throws IOException {
-            URI uri = exchange.getRequestURI();
-            String query;
-            if (TEST_MODE) {
-                query = uri.getQuery();
-                logger.info("Got an external request with uri "+uri+", hence query = "+query);
-            } else {
-                logger.info("Got an external request with uri " + uri);
-                final byte[] buffer = new byte[4096];
-                try (final InputStream in = exchange.getRequestBody();
-                     final ByteArrayOutputStream baos = new ByteArrayOutputStream(buffer.length)) {
-                    int length;
-                    while ((length = in.read(buffer, 0, buffer.length)) >= 0) {
-                        baos.write(buffer, 0, length);
+        Jsonb jsonb = JsonbBuilder.create();
+        while (true) {
+            ListDataReader<Wrapper> listDataReader = restList.createListDataReader(Wrapper.class);
+            Iterator<Wrapper> it = listDataReader.iterator();
+            while (it.hasNext()) {
+                Wrapper wrapper = it.next();
+                String uid = wrapper.getUid();
+                Model model = jsonb.fromJson(wrapper.getPayload(), Model.class);
+
+                // TODO
+                // removeRequest(uid);
+
+                Task task = new Task();
+                task.url = wrapper.getPayload();
+                TaskQueue.add(task);
+
+                String finalAnswer = "TIMEOUT";
+                try {
+                    if (task.latch.await(TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
+                        logger.info("Got answer: "+task.answer+"\n");
+                        finalAnswer = task.answer;
+                    } else {
+                        System.err.println("Got no answer");
                     }
-                    query = baos.toString();
+                } catch (InterruptedException e) {
+                    System.err.println("FAILED to get response in " + TIMEOUT_SECONDS + " seconds");
+                    finalAnswer = "INTERRUPT";
                 }
-                logger.info("Got query = " + query);
+
+                if (autonomousDatabaseWriter != null) {
+                    autonomousDatabaseWriter.logClientRequestAndAnswer(task.id, task.url, finalAnswer);
+                }
+
+                String response = "We're done, answer = " + finalAnswer + "\n";
+                logger.info(response);
             }
-            Task task = new Task();
-            task.url = query;
-            TaskQueue.add(task);
-            String finalAnswer = "TIMEOUT";
+
             try {
-                if (task.latch.await(TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
-                    logger.info("Got answer: "+task.answer+"\n");
-                    finalAnswer = task.answer;
-                } else {
-                    System.err.println("Got no answer");
-                }
-            } catch (InterruptedException e) {
-                System.err.println("FAILED to get response in " + TIMEOUT_SECONDS + " seconds");
-                finalAnswer = "INTERRUPT";
-            }
-
-            if (autonomousDatabaseWriter != null) {
-                autonomousDatabaseWriter.logClientRequestAndAnswer(task.id, task.url, finalAnswer);
-            }
-
-            String response = "We're done, answer = " + finalAnswer + "\n";
-
-            exchange.sendResponseHeaders(200, response.length());
-            OutputStream os = exchange.getResponseBody();
-            os.write(response.getBytes());
-            os.close();
+                Thread.sleep(DELAY);
+            } catch (InterruptedException e) {}
         }
     }
+
+    private void removeRequest(String uid) {
+        RestClient restRemove = RestClient.create()
+                .method("POST")
+                .host("https://cloud.gluonhq.com")
+                .header("Authorization", "Gluon " + GLUON_SERVER_KEY)
+                .path("/3/data/enterprise/list/" + BLOCKS +"/remove/" + uid);
+        // TODO
+    }
+
 }

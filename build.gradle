@@ -7,6 +7,7 @@ def IP_SERVER = project.hasProperty("ip.server") ? project.getProperty("ip.serve
 def DB_USER = project.hasProperty("db.user") ? project.getProperty("db.user") : "****"
 def DB_PASS = project.hasProperty("db.pass") ? project.getProperty("db.pass") : "****"
 def NFS_SHARED = project.hasProperty("nfs.shared") ? project.getProperty("nfs.shared") : "/var/nfsshare"
+def GLUON_SERVER_KEY = project.hasProperty("gluon.server.key") ? project.getProperty("gluon.server.key") : "****"
 
 task setupDependencies() {
     doFirst {
@@ -155,7 +156,7 @@ task PiDeploy(type:Exec, dependsOn: setupDependencies) {
     doFirst {
         if (setupDependencies.error == 0) {
             println "Deploy Pi Cluster projects"
-            commandLine 'sh', "-c", "./deploy.sh $IP_MON_SERVER $IP_SERVER $IP_DISPLAY $DB_USER $DB_PASS $NFS_SHARED"
+            commandLine 'sh', "-c", "./deploy.sh $IP_MON_SERVER $IP_SERVER $IP_DISPLAY $DB_USER $DB_PASS $NFS_SHARED $GLUON_SERVER_KEY"
         } else {
             println "There were errors during Setup: ${setupDependencies.error}"
             commandLine 'sh', "-c", 'echo "Task failed"'

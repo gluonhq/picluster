@@ -45,7 +45,7 @@ rm -rf displayapp-win
 echo "Running IoTMonitorClient::build..."
 ./gradlew IoTMonitorClient:clean IoTMonitorClient:build
 mkdir -p pimonitorclientbundle/class
-sed "s/NFS_SHARED/$6/g" IoTMonitorClient/src/scripts/pimonitor.service > deploy/PiMonitor/pimonitor.service
+sed "s#NFS_SHARED#$6#g" IoTMonitorClient/src/scripts/pimonitor.service > deploy/PiMonitor/pimonitor.service
 cp -r IoTMonitorClient/build/classes/java/main/com pimonitorclientbundle/class
 sed -e "s/IP_MON_SERVER/$1/g" -e "s#NFS_SHARED#$6#g" IoTMonitorClient/src/scripts/startclientmonitor.sh > pimonitorclientbundle/startclientmonitor.sh
 chmod +x pimonitorclientbundle/startclientmonitor.sh
@@ -69,7 +69,7 @@ echo "Running Server::build..."
 
 mkdir -p serverbundle
 cp Server/build/libs/Server.jar serverbundle
-sed -e "s/DB_USER/$4/g" -e "s/DB_PASS/$5/g" Server/src/scripts/startserver.sh > serverbundle/startserver.sh
+sed -e "s/DB_USER/$4/g" -e "s/DB_PASS/$5/g" -e "s/GLUON_SERVER_KEY/$7/g" Server/src/scripts/startserver.sh > serverbundle/startserver.sh
 chmod +x serverbundle/startserver.sh
 unzip -o Server/files/wallet.zip -d serverbundle/
 zip -r deploy/Server/serverbundle.zip serverbundle

@@ -30,7 +30,9 @@ public class Main {
         dl.startListening();
 
         AutonomousDatabaseWriter autonomousDatabaseWriter = null;
-        if (args.length >= 2) {
+        String gluonServerKey = "";
+
+        if (args.length >= 3) {
             autonomousDatabaseWriter = new AutonomousDatabaseWriter(args[0], args[1]);
             try {
                 autonomousDatabaseWriter.setupConnectionPool();
@@ -38,9 +40,10 @@ public class Main {
                 // too bad if the connection pool to the oracle Autonomous Database could not be setup
                 logger.log(Level.SEVERE, "Failed to setup connection pool to oracle autonomous database.", sql);
             }
+            gluonServerKey = args[2];
         }
 
-        ExternalRequestHandler ext = new ExternalRequestHandler(autonomousDatabaseWriter);
+        ExternalRequestHandler ext = new ExternalRequestHandler(autonomousDatabaseWriter, gluonServerKey);
         ext.startListening();
     }
 

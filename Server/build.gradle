@@ -12,6 +12,10 @@ dependencies {
     runtime files('lib/oraclepki.jar')
     runtime files('lib/osdt_cert.jar')
     runtime files('lib/osdt_core.jar')
+
+    implementation 'com.gluonhq:connect:2.0.1'
+    implementation 'javax.json.bind:javax.json.bind-api:1.0'
+    runtimeOnly 'org.eclipse:yasson:1.0.5'
 }
 
 sourceCompatibility = 11
