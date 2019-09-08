@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.gluonhq.charm.glisten.control.Icon?>
+<?import com.gluonhq.charm.glisten.mvc.View?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<View fx:id="help" prefHeight="600.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gluonhq.picluster.mobile.views.HelpPresenter">
+   <top>
+      <HBox fx:id="topBox" styleClass="top-box" BorderPane.alignment="CENTER">
+         <children>
+            <Label fx:id="helpLabel" styleClass="help" text="%label.help.done" wrapText="true">
+               <graphic>
+                  <Icon content="CHECK" />
+               </graphic>
+            </Label>
+         </children>
+      </HBox>
+   </top>
+   <center>
+      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" BorderPane.alignment="CENTER">
+         <content>
+            <VBox alignment="CENTER" spacing="15.0" styleClass="box">
+               <children>
+                  <Label styleClass="intro" text="%text.instructions" />
+                  <Label styleClass="help" text="%label.text.1" wrapText="true" />
+                  <VBox styleClass="box1">
+                     <children>
+                        <Label styleClass="help" text="%label.text.2.1" wrapText="true" />
+                        <HBox styleClass="link">
+                           <children>
+                              <Button graphicTextGap="20.0" mnemonicParsing="false" mouseTransparent="true" text="%button.text.2">
+                                 <graphic>
+                                    <Icon content="ADD_TO_QUEUE" />
+                                 </graphic>
+                              </Button>
+                           </children>
+                        </HBox>
+                        <Label styleClass="help" text="%label.text.2.2" wrapText="true" />
+                        <HBox styleClass="link">
+                           <children>
+                              <ImageView fitHeight="80.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@block1.png" />
+                                 </image>
+                              </ImageView>
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+                  <VBox styleClass="box1">
+                     <children>
+                        <Label styleClass="help" text="%label.text.3.1" wrapText="true" />
+                        <HBox styleClass="link">
+                           <children>
+                              <ImageView fitHeight="80.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@toolbar.png" />
+                                 </image>
+                              </ImageView>
+                           </children>
+                        </HBox>
+                        <Label styleClass="help" text="%label.text.3.2" wrapText="true" />
+                        <HBox styleClass="link">
+                           <children>
+                              <ImageView fitHeight="80.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@block2.png" />
+                                 </image>
+                              </ImageView>
+                           </children>
+                        </HBox>
+                        <Label styleClass="help" text="%label.text.3.3" wrapText="true" />
+                     </children>
+                  </VBox>
+                  <VBox styleClass="box1">
+                     <children>
+                        <Label styleClass="help" text="%label.text.4.1" wrapText="true" />
+                        <HBox styleClass="link">
+                           <children>
+                              <ImageView fitHeight="80.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@block3.png" />
+                                 </image>
+                              </ImageView>
+                           </children>
+                        </HBox>
+                        <Label styleClass="help" text="%label.text.4.2" wrapText="true" />
+                     </children>
+                  </VBox>
+               </children>
+            </VBox>
+         </content>
+      </ScrollPane>
+   </center>
+</View>

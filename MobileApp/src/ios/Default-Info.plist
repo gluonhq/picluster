@@ -3,15 +3,17 @@
 <plist version="1.0">
 <dict>
         <key>CFBundleIdentifier</key>
-        <string>com.gluonhq.picluster.mobile.Main</string>
+        <string>com.gluonhq.picluster.mobile.MainApp</string>
         <key>CFBundleVersion</key>
-        <string>1.0</string>
+        <string>1</string>
+        <key>CFBundleShortVersionString</key>
+        <string>1.0.0</string>
         <key>CFBundleExecutable</key>
         <string>MobileApp</string>
         <key>CFBundleIconName</key>
         <string>AppIcon</string>
         <key>CFBundleName</key>
-        <string>Mobile</string>
+        <string>Coding Blocks</string>
         <key>CFBundlePackageType</key>
         <string>APPL</string>
         <key>LSRequiresIPhoneOS</key>
@@ -19,16 +21,10 @@
         <key>UISupportedInterfaceOrientations</key>
         <array>
                 <string>UIInterfaceOrientationPortrait</string>
-                <string>UIInterfaceOrientationLandscapeLeft</string>
-                <string>UIInterfaceOrientationLandscapeRight</string>
-                <string>UIInterfaceOrientationPortraitUpsideDown</string>
         </array>
         <key>UISupportedInterfaceOrientations~ipad</key>
         <array>
                 <string>UIInterfaceOrientationPortrait</string>
-                <string>UIInterfaceOrientationLandscapeLeft</string>
-                <string>UIInterfaceOrientationLandscapeRight</string>
-                <string>UIInterfaceOrientationPortraitUpsideDown</string>
         </array>
         <key>UIRequiredDeviceCapabilities</key>
         <array>

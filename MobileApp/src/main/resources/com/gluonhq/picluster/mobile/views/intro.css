@@ -1,3 +1,21 @@
 .view {
 
 }
+
+.label.title {
+    -fx-font-size: 1.4em;
+    -fx-text-fill: -primary-swatch-700;
+}
+.label.intro {
+    -fx-font-size: 1.2em;
+    -fx-text-fill: -primary-swatch-600;
+}
+
+.label.help {
+    -fx-font-size: 0.9em;
+    -fx-text-fill: -primary-swatch-400;
+}
+
+.button > .text {
+    -fx-font-size: 1.3em;
+}

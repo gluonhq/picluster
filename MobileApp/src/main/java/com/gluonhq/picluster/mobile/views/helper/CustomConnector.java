@@ -98,7 +98,7 @@ public class CustomConnector extends HBox implements ConnectorShape {
 
         radiusProperty().addListener((ov,oldV,newV) -> requestLayout());
         spacingProperty().bind(radiusProperty.divide(4));
-        circle.radiusProperty().bind(radiusProperty);
+        circle.radiusProperty().bind(radiusProperty.multiply(0.8));
         circle.getStyleClass().add("connector");
 
         textPane.getStyleClass().add("text-connector");

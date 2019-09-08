@@ -1,9 +1,10 @@
 .view {
-    -fx-background-color: linear-gradient(to bottom, rgb(10,32,60), rgb(42,52,120));
+    /*-fx-background-color: linear-gradient(to bottom, rgb(10,32,60), rgb(42,52,120));*/
+    -fx-background-color: -primary-swatch-100;
 }
 
 .window {
-    -fx-background-color: rgba(120,140,255,0.2);
+    /*-fx-background-color: rgba(120,140,255,0.2);*/
     -fx-border-color: rgba(120,140,255,0.42);
     -fx-border-width: 2;
 }
@@ -33,8 +34,8 @@
 }
 
 .vnode-connector > .connector.data {
-    -fx-fill: rgba(255,255,0,0.75);
-    -fx-stroke: rgba(255,255,0,0.42);
+    -fx-fill: rgba(255, 87, 34,0.75);
+    -fx-stroke: rgba(255, 87, 34, 0.42);
 }
 
 .vnode-connector > .connector.event {
@@ -59,5 +60,25 @@
 
 .dropdown-button > .container {
     /* TODO */
-    -fx-background-color: rgba(255,255,255,50);
+    -fx-background-color: rgba(255, 87, 34, 0.50);
 }
+
+.text-field {
+    -fx-background-color: rgba(255, 87, 34, 0.50);
+}
+
+.tool-bar {
+    -fx-spacing: 5;
+}
+
+.tool-bar > HBox > .button > .icon > .label {
+    -fx-font-size: 1.1em;
+}
+
+.tool-bar > HBox > .separator > .line {
+    -fx-border-width: 1;
+    -fx-border-color: -primary-swatch-800;
+    /*-fx-background-insets: 0;*/
+    -fx-background-color: -primary-swatch-800;
+}
+

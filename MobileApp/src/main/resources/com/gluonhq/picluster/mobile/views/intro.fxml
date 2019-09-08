@@ -2,22 +2,38 @@
 
 <?import com.gluonhq.charm.glisten.control.Icon?>
 <?import com.gluonhq.charm.glisten.mvc.View?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 
-
-<View fx:id="intro" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gluonhq.picluster.mobile.views.IntroPresenter">
+<View fx:id="intro" prefHeight="600.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gluonhq.picluster.mobile.views.IntroPresenter">
    <center>
-      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="15.0" BorderPane.alignment="CENTER">
+      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="30.0" BorderPane.alignment="CENTER">
          <children>
-            <Button mnemonicParsing="false" onAction="#buttonClick" text="%button.text">
+            <Label styleClass="title" text="%label.intro.title" wrapText="true" />
+            <Label layoutX="35.0" layoutY="270.0" styleClass="intro" text="%label.intro.text" textAlignment="CENTER" wrapText="true" />
+            <Button graphicTextGap="20.0" mnemonicParsing="false" onAction="#buttonClick" text="%button.text">
                <graphic>
-                  <Icon content="LANGUAGE" />
+                  <Icon content="ADD_TO_QUEUE" />
                </graphic>
             </Button>
          </children>
       </VBox>
    </center>
+   <bottom>
+      <VBox alignment="CENTER" BorderPane.alignment="CENTER">
+         <children>
+            <Label fx:id="helpLabel" contentDisplay="RIGHT" styleClass="help" text="%label.help.text">
+               <graphic>
+                  <Icon content="HELP_OUTLINE" />
+               </graphic>
+            </Label>
+         </children>
+         <padding>
+            <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+         </padding>
+      </VBox>
+   </bottom>
 </View>

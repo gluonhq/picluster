@@ -1,0 +1,44 @@
+.view {
+
+}
+
+.top-box {
+    -fx-padding: 1mm 2mm 1mm 1mm;
+    -fx-alignment: CENTER_RIGHT;
+}
+
+.top-box.ios {
+    -fx-padding: 5.6mm 2mm 1mm 1mm;
+}
+
+.top-box.ios.notch {
+    -fx-padding: 11.52mm 2mm 1mm 1mm;
+}
+
+.scroll-pane,
+.scroll-pane > .viewport {
+    -fx-background-color: -primary-swatch-100;
+}
+
+.box {
+    -fx-padding: 30;
+    -fx-spacing: 30;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.label.intro {
+    -fx-font-size: 2em;
+    -fx-text-fill: -primary-swatch-800;
+    -fx-text-alignment: center;
+}
+
+.label.help {
+    -fx-font-size: 1.1em;
+    -fx-text-fill: -primary-swatch-500;
+    -fx-text-alignment: left;
+}
+
+.box > .box1 > .link {
+    -fx-padding: 5;
+    -fx-alignment: CENTER;
+}

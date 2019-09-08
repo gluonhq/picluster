@@ -7,18 +7,18 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
-public class Main extends MobileApplication {
+public class MainApp extends MobileApplication {
 
     @Override
     public void init() {
-        AppViewManager.registerViewsAndDrawer(this);
+        AppViewManager.registerViews(this);
     }
 
     @Override
     public void postInit(Scene scene) {
-        Swatch.BLUE.assignTo(scene);
+        Swatch.BLUE_GREY.assignTo(scene);
 
-        scene.getStylesheets().add(Main.class.getResource("style.css").toExternalForm());
-        ((Stage) scene.getWindow()).getIcons().add(new Image(Main.class.getResourceAsStream("/icon.png")));
+        scene.getStylesheets().add(MainApp.class.getResource("style.css").toExternalForm());
+        ((Stage) scene.getWindow()).getIcons().add(new Image(MainApp.class.getResourceAsStream("/icon.png")));
     }
 }

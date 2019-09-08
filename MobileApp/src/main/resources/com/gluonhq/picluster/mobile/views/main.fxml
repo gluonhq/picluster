@@ -11,7 +11,7 @@
    <bottom>
       <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
         <items>
-          <Button fx:id="loopButton" mnemonicParsing="false">
+          <Button fx:id="loopButton" mnemonicParsing="false" disable="true">
                <graphic>
                   <Icon content="LOOP" />
                </graphic>
@@ -42,6 +42,12 @@
                <graphic>
                   <Icon content="FUNCTIONS" />
                </graphic>
+            </Button>
+            <Separator orientation="VERTICAL" />
+            <Button fx:id="execButton" layoutX="150.0" layoutY="10.0" mnemonicParsing="false">
+                <graphic>
+                    <Icon content="SEND" />
+                </graphic>
             </Button>
         </items>
       </ToolBar>

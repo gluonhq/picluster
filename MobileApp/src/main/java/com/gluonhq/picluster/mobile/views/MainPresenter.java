@@ -1,11 +1,12 @@
 package com.gluonhq.picluster.mobile.views;
 
 import com.gluonhq.charm.glisten.afterburner.GluonPresenter;
+import com.gluonhq.charm.glisten.control.Alert;
 import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.mvc.View;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 import com.gluonhq.connect.GluonObservableObject;
-import com.gluonhq.picluster.mobile.Main;
+import com.gluonhq.picluster.mobile.MainApp;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,8 @@ import com.gluonhq.picluster.mobile.views.helper.CompareFlowNodeSkin;
 import com.gluonhq.picluster.mobile.views.helper.CompareValue;
 import com.gluonhq.picluster.mobile.views.helper.DoubleFlowNodeSkin;
 import com.gluonhq.picluster.mobile.views.helper.DoubleValue;
+import com.gluonhq.picluster.mobile.views.helper.ExecNodeSkin;
+import com.gluonhq.picluster.mobile.views.helper.ExecValue;
 import com.gluonhq.picluster.mobile.views.helper.FunctionFlowNodeSkin;
 import com.gluonhq.picluster.mobile.views.helper.FunctionValue;
 import com.gluonhq.picluster.mobile.views.helper.OperatorFlowNodeSkin;
@@ -33,12 +36,13 @@ import eu.mihosoft.vrl.workflow.ValueObject;
 import eu.mihosoft.vrl.workflow.VisualizationRequest;
 import eu.mihosoft.vrl.workflow.fx.FXValueSkinFactory;
 import eu.mihosoft.vrl.workflow.fx.ScalableContentPane;
+import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 
 import javax.inject.Inject;
 
-public class MainPresenter extends GluonPresenter<Main> {
+public class MainPresenter extends GluonPresenter<MainApp> {
 
     private final static boolean TEST_MODE = "test".equalsIgnoreCase(System.getenv("picluster_mode"));
 
@@ -49,6 +53,7 @@ public class MainPresenter extends GluonPresenter<Main> {
     @FXML private Button numButton;
     @FXML private Button mathButton;
     @FXML private Button functionButton;
+    @FXML private Button execButton;
 
     @FXML private ResourceBundle resources;
 
@@ -60,11 +65,9 @@ public class MainPresenter extends GluonPresenter<Main> {
         main.showingProperty().addListener((obs, oldValue, newValue) -> {
             if (newValue) {
                 AppBar appBar = getApp().getAppBar();
-                appBar.setNavIcon(MaterialDesignIcon.MENU.button(e ->
-                        getApp().getDrawer().open()));
-                appBar.setTitleText("Main");
-                appBar.getActionItems().add(MaterialDesignIcon.SEND.button(e ->
-                        send()));
+                appBar.setNavIcon(MaterialDesignIcon.CHEVRON_LEFT.button(e ->
+                        getApp().goHome()));
+                appBar.setTitleText(resources.getString("view.title"));
             }
         });
 
@@ -85,6 +88,7 @@ public class MainPresenter extends GluonPresenter<Main> {
         fXSkinFactory.addSkinClassForValueType(CompareValue.class, CompareFlowNodeSkin.class);
         fXSkinFactory.addSkinClassForValueType(DoubleValue.class, DoubleFlowNodeSkin.class);
         fXSkinFactory.addSkinClassForValueType(String.class, StringFlowNodeSkin.class);
+        fXSkinFactory.addSkinClassForValueType(ExecValue.class, ExecNodeSkin.class);
         flow.setSkinFactories(fXSkinFactory);
 
         main.setCenter(canvas);
@@ -124,6 +128,26 @@ public class MainPresenter extends GluonPresenter<Main> {
             VNode n1 = createNode(new FunctionValue("Function"), "Functions");
             addInputConnector(n1, "data", true);
             addOutputConnector(n1, "data", true);
+        });
+
+        execButton.setOnAction(e -> {
+            ExecValue exec = new ExecValue("Exec");
+            exec.setValue(this::send);
+            VNode n1 = createNode(exec, "Run");
+            addInputConnector(n1, "data", true);
+        });
+
+        flow.getNodes().addListener((ListChangeListener<VNode>) c -> {
+            while (c.next()) {
+                boolean execBlock = false;
+                for (VNode n : flow.getNodes()) {
+                    if (n.getValueObject().getValue() instanceof ExecValue) {
+                        execBlock = true;
+                        break;
+                    }
+                }
+                execButton.setDisable(execBlock);
+            }
         });
     }
 
@@ -203,5 +227,11 @@ public class MainPresenter extends GluonPresenter<Main> {
             modelGluonObservableObject.setOnSucceeded(e -> System.out.println("sent " + e));
             modelGluonObservableObject.exceptionProperty().addListener((obs, ov, nv) -> System.out.println("failed: " + nv));
         }
+
+        Alert alert = new Alert(javafx.scene.control.Alert.AlertType.INFORMATION,
+                resources.getString("flow.sent.text"));
+        alert.showAndWait();
     }
+
+
 }
