@@ -1,11 +1,12 @@
 package com.gluonhq.picluster.mobile.views;
 
+import com.gluonhq.charm.down.Platform;
 import com.gluonhq.charm.glisten.afterburner.GluonPresenter;
 import com.gluonhq.charm.glisten.control.Alert;
 import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.mvc.View;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
-import com.gluonhq.picluster.mobile.MainApp;
+import com.gluonhq.picluster.mobile.CodingBlocks;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,17 +15,17 @@ import java.util.ResourceBundle;
 import com.gluonhq.picluster.mobile.model.Block;
 import com.gluonhq.picluster.mobile.model.Model;
 import com.gluonhq.picluster.mobile.service.Service;
-import com.gluonhq.picluster.mobile.views.helper.CompareFlowNodeSkin;
-import com.gluonhq.picluster.mobile.views.helper.CompareValue;
-import com.gluonhq.picluster.mobile.views.helper.DoubleFlowNodeSkin;
-import com.gluonhq.picluster.mobile.views.helper.DoubleValue;
-import com.gluonhq.picluster.mobile.views.helper.ExecNodeSkin;
-import com.gluonhq.picluster.mobile.views.helper.ExecValue;
-import com.gluonhq.picluster.mobile.views.helper.FunctionFlowNodeSkin;
-import com.gluonhq.picluster.mobile.views.helper.FunctionValue;
-import com.gluonhq.picluster.mobile.views.helper.OperatorFlowNodeSkin;
-import com.gluonhq.picluster.mobile.views.helper.OperatorValue;
-import com.gluonhq.picluster.mobile.views.helper.StringFlowNodeSkin;
+import com.gluonhq.picluster.mobile.vworkflows.CompareFlowNodeSkin;
+import com.gluonhq.picluster.mobile.vworkflows.CompareValue;
+import com.gluonhq.picluster.mobile.vworkflows.DoubleFlowNodeSkin;
+import com.gluonhq.picluster.mobile.vworkflows.DoubleValue;
+import com.gluonhq.picluster.mobile.vworkflows.ExecNodeSkin;
+import com.gluonhq.picluster.mobile.vworkflows.ExecValue;
+import com.gluonhq.picluster.mobile.vworkflows.FunctionFlowNodeSkin;
+import com.gluonhq.picluster.mobile.vworkflows.FunctionValue;
+import com.gluonhq.picluster.mobile.vworkflows.OperatorFlowNodeSkin;
+import com.gluonhq.picluster.mobile.vworkflows.OperatorValue;
+import com.gluonhq.picluster.mobile.vworkflows.StringFlowNodeSkin;
 import eu.mihosoft.vrl.workflow.Connection;
 import eu.mihosoft.vrl.workflow.Connector;
 import eu.mihosoft.vrl.workflow.DefaultValueObject;
@@ -38,10 +39,11 @@ import eu.mihosoft.vrl.workflow.fx.ScalableContentPane;
 import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.layout.VBox;
 
 import javax.inject.Inject;
 
-public class MainPresenter extends GluonPresenter<MainApp> {
+public class MainPresenter extends GluonPresenter<CodingBlocks> {
 
     @FXML private View main;
     @FXML private Button loopButton;
@@ -51,6 +53,7 @@ public class MainPresenter extends GluonPresenter<MainApp> {
     @FXML private Button mathButton;
     @FXML private Button functionButton;
     @FXML private Button execButton;
+    @FXML private VBox bottomBox;
 
     @FXML private ResourceBundle resources;
 
@@ -68,6 +71,9 @@ public class MainPresenter extends GluonPresenter<MainApp> {
             }
         });
 
+        if (Platform.isIOS() && ! bottomBox.getStyleClass().contains("ios")) {
+            bottomBox.getStyleClass().add("ios");
+        }
         // create scalable root pane
         ScalableContentPane canvas = new ScalableContentPane();
         canvas.getStyleClass().setAll("vflow-background");

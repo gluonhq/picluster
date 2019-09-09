@@ -1,4 +1,4 @@
-package com.gluonhq.picluster.mobile.views.helper;
+package com.gluonhq.picluster.mobile.vworkflows;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;

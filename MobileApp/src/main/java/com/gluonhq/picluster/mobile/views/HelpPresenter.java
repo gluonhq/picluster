@@ -5,14 +5,14 @@ import com.gluonhq.charm.down.Services;
 import com.gluonhq.charm.down.plugins.DisplayService;
 import com.gluonhq.charm.glisten.afterburner.GluonPresenter;
 import com.gluonhq.charm.glisten.mvc.View;
-import com.gluonhq.picluster.mobile.MainApp;
+import com.gluonhq.picluster.mobile.CodingBlocks;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 
 import java.util.ResourceBundle;
 
-public class HelpPresenter extends GluonPresenter<MainApp> {
+public class HelpPresenter extends GluonPresenter<CodingBlocks> {
 
     @FXML private View help;
     @FXML private Label helpLabel;

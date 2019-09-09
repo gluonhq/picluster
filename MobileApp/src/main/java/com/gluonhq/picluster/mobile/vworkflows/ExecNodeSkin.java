@@ -1,7 +1,6 @@
-package com.gluonhq.picluster.mobile.views.helper;
+package com.gluonhq.picluster.mobile.vworkflows;
 
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
-import eu.mihosoft.vrl.workflow.Connection;
 import eu.mihosoft.vrl.workflow.ConnectionEvent;
 import eu.mihosoft.vrl.workflow.Connector;
 import eu.mihosoft.vrl.workflow.VFlow;
@@ -10,7 +9,6 @@ import eu.mihosoft.vrl.workflow.fx.FXSkinFactory;
 import javafx.collections.ListChangeListener;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 
 public class ExecNodeSkin extends CustomFXFlowNodeSkin {

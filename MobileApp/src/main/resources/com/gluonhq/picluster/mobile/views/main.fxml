@@ -6,50 +6,55 @@
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
 
 <View fx:id="main" prefHeight="600.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gluonhq.picluster.mobile.views.MainPresenter">
-   <bottom>
-      <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-        <items>
-          <Button fx:id="loopButton" mnemonicParsing="false" disable="true">
-               <graphic>
-                  <Icon content="LOOP" />
-               </graphic>
-            </Button>
-            <Button fx:id="ifButton" layoutX="10.0" layoutY="10.0" mnemonicParsing="false">
-               <graphic>
-                  <Icon content="CALL_SPLIT" />
-               </graphic>
-            </Button>
-            <Separator orientation="VERTICAL" />
-            <Button fx:id="varButton" layoutX="57.0" layoutY="10.0" mnemonicParsing="false">
-               <graphic>
-                  <Icon content="CHAT_BUBBLE_OUTLINE" />
-               </graphic>
-            </Button>
-            <Button fx:id="numButton" layoutX="121.0" layoutY="10.0" mnemonicParsing="false">
-               <graphic>
-                  <Icon content="FILTER_9" />
-               </graphic>
-            </Button>
-            <Separator layoutX="103.0" layoutY="10.0" orientation="VERTICAL" />
-            <Button fx:id="mathButton" layoutX="103.0" layoutY="10.0" mnemonicParsing="false">
-               <graphic>
-                  <Icon content="PLUS_ONE" />
-               </graphic>
-            </Button>
-            <Button fx:id="functionButton" layoutX="150.0" layoutY="10.0" mnemonicParsing="false">
-               <graphic>
-                  <Icon content="FUNCTIONS" />
-               </graphic>
-            </Button>
-            <Separator orientation="VERTICAL" />
-            <Button fx:id="execButton" layoutX="150.0" layoutY="10.0" mnemonicParsing="false">
-                <graphic>
-                    <Icon content="SEND" />
-                </graphic>
-            </Button>
-        </items>
-      </ToolBar>
-   </bottom>
+    <bottom>
+        <VBox fx:id="bottomBox" styleClass="bottom-box" alignment="TOP_CENTER" BorderPane.alignment="CENTER">
+            <children>
+                <ToolBar prefHeight="40.0" prefWidth="200.0">
+                    <items>
+                        <Button fx:id="loopButton" disable="true" mnemonicParsing="false">
+                            <graphic>
+                                <Icon content="LOOP" />
+                            </graphic>
+                        </Button>
+                        <Button fx:id="ifButton" layoutX="10.0" layoutY="10.0" mnemonicParsing="false">
+                            <graphic>
+                                <Icon content="CALL_SPLIT" />
+                            </graphic>
+                        </Button>
+                        <Separator orientation="VERTICAL" />
+                        <Button fx:id="varButton" layoutX="57.0" layoutY="10.0" mnemonicParsing="false">
+                            <graphic>
+                                <Icon content="CHAT_BUBBLE_OUTLINE" />
+                            </graphic>
+                        </Button>
+                        <Button fx:id="numButton" layoutX="121.0" layoutY="10.0" mnemonicParsing="false">
+                            <graphic>
+                                <Icon content="FILTER_9" />
+                            </graphic>
+                        </Button>
+                        <Separator layoutX="103.0" layoutY="10.0" orientation="VERTICAL" />
+                        <Button fx:id="mathButton" layoutX="103.0" layoutY="10.0" mnemonicParsing="false">
+                            <graphic>
+                                <Icon content="PLUS_ONE" />
+                            </graphic>
+                        </Button>
+                        <Button fx:id="functionButton" layoutX="150.0" layoutY="10.0" mnemonicParsing="false">
+                            <graphic>
+                                <Icon content="FUNCTIONS" />
+                            </graphic>
+                        </Button>
+                        <Separator orientation="VERTICAL" />
+                        <Button fx:id="execButton" layoutX="150.0" layoutY="10.0" mnemonicParsing="false">
+                            <graphic>
+                                <Icon content="SEND" />
+                            </graphic>
+                        </Button>
+                    </items>
+                </ToolBar>
+            </children>
+        </VBox>
+    </bottom>
 </View>

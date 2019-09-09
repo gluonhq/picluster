@@ -1,1 +1,3 @@
 include 'MobileApp'
+
+rootProject.name = "CodingBlocks"

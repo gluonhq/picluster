@@ -7,7 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
-public class MainApp extends MobileApplication {
+public class CodingBlocks extends MobileApplication {
 
     @Override
     public void init() {
@@ -18,7 +18,7 @@ public class MainApp extends MobileApplication {
     public void postInit(Scene scene) {
         Swatch.BLUE_GREY.assignTo(scene);
 
-        scene.getStylesheets().add(MainApp.class.getResource("style.css").toExternalForm());
-        ((Stage) scene.getWindow()).getIcons().add(new Image(MainApp.class.getResourceAsStream("/icon.png")));
+        scene.getStylesheets().add(CodingBlocks.class.getResource("style.css").toExternalForm());
+        ((Stage) scene.getWindow()).getIcons().add(new Image(CodingBlocks.class.getResourceAsStream("/icon.png")));
     }
 }

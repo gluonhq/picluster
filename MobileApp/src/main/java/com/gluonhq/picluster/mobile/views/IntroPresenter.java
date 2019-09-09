@@ -2,13 +2,13 @@ package com.gluonhq.picluster.mobile.views;
 
 import com.gluonhq.charm.glisten.afterburner.GluonPresenter;
 import com.gluonhq.charm.glisten.mvc.View;
-import com.gluonhq.picluster.mobile.MainApp;
+import com.gluonhq.picluster.mobile.CodingBlocks;
 import java.util.ResourceBundle;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 
-public class IntroPresenter extends GluonPresenter<MainApp> {
+public class IntroPresenter extends GluonPresenter<CodingBlocks> {
 
     @FXML private View intro;
     @FXML private Label helpLabel;

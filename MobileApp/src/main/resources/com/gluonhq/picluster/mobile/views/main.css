@@ -1,10 +1,8 @@
 .view {
-    /*-fx-background-color: linear-gradient(to bottom, rgb(10,32,60), rgb(42,52,120));*/
     -fx-background-color: -primary-swatch-100;
 }
 
 .window {
-    /*-fx-background-color: rgba(120,140,255,0.2);*/
     -fx-border-color: rgba(120,140,255,0.42);
     -fx-border-width: 2;
 }
@@ -72,7 +70,7 @@
 }
 
 .tool-bar > HBox > .button > .icon > .label {
-    -fx-font-size: 1.1em;
+    -fx-font-size: 1.2em;
 }
 
 .tool-bar > HBox > .separator > .line {
@@ -82,3 +80,6 @@
     -fx-background-color: -primary-swatch-800;
 }
 
+.bottom-box.ios > .tool-bar {
+    -fx-padding: 1mm 1mm 10mm 1mm;
+}

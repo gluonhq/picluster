@@ -2,6 +2,10 @@
 
 }
 
+.box {
+    -fx-padding: 20;
+}
+
 .label.title {
     -fx-font-size: 1.4em;
     -fx-text-fill: -primary-swatch-700;

@@ -31,7 +31,7 @@
  * authors and should not be interpreted as representing official policies, either expressed
  * or implied, of Michael Hoffer <info@michaelhoffer.de>.
  */
-package com.gluonhq.picluster.mobile.views.helper;
+package com.gluonhq.picluster.mobile.vworkflows;
 
 import eu.mihosoft.vrl.workflow.Connection;
 import eu.mihosoft.vrl.workflow.Connector;

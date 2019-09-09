@@ -18,7 +18,7 @@ public class AppViewManager {
 
     public static final AppView INTRO_VIEW = view("Intro", IntroPresenter.class, MaterialDesignIcon.HOME, SHOW_IN_DRAWER, HOME_VIEW, SKIP_VIEW_STACK);
     public static final AppView HELP_VIEW = view("Help", HelpPresenter.class, MaterialDesignIcon.INFO, SHOW_IN_DRAWER);
-    public static final AppView MAIN_VIEW = view("MainApp", MainPresenter.class, MaterialDesignIcon.DASHBOARD, SHOW_IN_DRAWER);
+    public static final AppView MAIN_VIEW = view("CodingBlocks", MainPresenter.class, MaterialDesignIcon.DASHBOARD, SHOW_IN_DRAWER);
     
     private static AppView view(String title, Class<? extends GluonPresenter<?>> presenterClass, MaterialDesignIcon menuIcon, AppView.Flag... flags ) {
         return REGISTRY.createView(name(presenterClass), title, presenterClass, menuIcon, flags);
