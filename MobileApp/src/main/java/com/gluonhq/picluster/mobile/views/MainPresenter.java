@@ -26,6 +26,7 @@ import com.gluonhq.picluster.mobile.vworkflows.FunctionValue;
 import com.gluonhq.picluster.mobile.vworkflows.OperatorFlowNodeSkin;
 import com.gluonhq.picluster.mobile.vworkflows.OperatorValue;
 import com.gluonhq.picluster.mobile.vworkflows.StringFlowNodeSkin;
+import com.gluonhq.picluster.mobile.vworkflows.lang.FlowToExpression;
 import eu.mihosoft.vrl.workflow.Connection;
 import eu.mihosoft.vrl.workflow.Connector;
 import eu.mihosoft.vrl.workflow.DefaultValueObject;
@@ -219,6 +220,8 @@ public class MainPresenter extends GluonPresenter<CodingBlocks> {
             blocks.add(block);
         }
         model.setBlocks(blocks);
+
+        model.setExpression(getExpression());
         System.out.println("model = " + model);
         service.addBlock(model);
 
@@ -227,5 +230,10 @@ public class MainPresenter extends GluonPresenter<CodingBlocks> {
         alert.showAndWait();
     }
 
+    private String getExpression() {
+        FlowToExpression converter = new FlowToExpression();
+        FlowToExpression.Result result = converter.parseFlow(flow);
+        return result.isValid() ? result.getExpression() : "error";
+    }
 
 }

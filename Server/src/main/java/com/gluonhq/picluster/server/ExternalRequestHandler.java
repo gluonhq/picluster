@@ -46,9 +46,6 @@ public class ExternalRequestHandler {
                 String uid = wrapper.getUid();
                 Model model = jsonb.fromJson(wrapper.getPayload(), Model.class);
 
-                // TODO
-                // removeRequest(uid);
-
                 Task task = new Task();
                 task.url = wrapper.getPayload();
                 TaskQueue.add(task);
@@ -57,6 +54,7 @@ public class ExternalRequestHandler {
                 try {
                     if (task.latch.await(TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
                         logger.info("Got answer: "+task.answer+"\n");
+                        removeRequest(uid);
                         finalAnswer = task.answer;
                     } else {
                         System.err.println("Got no answer");
@@ -81,12 +79,16 @@ public class ExternalRequestHandler {
     }
 
     private void removeRequest(String uid) {
-        RestClient restRemove = RestClient.create()
-                .method("POST")
-                .host("https://cloud.gluonhq.com")
-                .header("Authorization", "Gluon " + GLUON_SERVER_KEY)
-                .path("/3/data/enterprise/list/" + BLOCKS +"/remove/" + uid);
-        // TODO
+        ProcessBuilder pb = new ProcessBuilder("curl", "-X", "POST",
+                "https://cloud.gluonhq.com/3/data/enterprise/list/" + BLOCKS +"/remove/" + uid,
+                "-H", "Authorization: Gluon " + GLUON_SERVER_KEY,
+                "-H", "Content-Type: application/json");
+        pb.redirectErrorStream(true);
+        try {
+            pb.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

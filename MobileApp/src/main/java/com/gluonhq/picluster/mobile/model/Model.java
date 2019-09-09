@@ -5,6 +5,8 @@ import java.util.List;
 
 public class Model {
 
+    private String expression;
+
     private List<Block> blocks;
 
     public Model() {
@@ -19,10 +21,19 @@ public class Model {
         this.blocks = blocks;
     }
 
+    public String getExpression() {
+        return expression;
+    }
+
+    public void setExpression(String expression) {
+        this.expression = expression;
+    }
+
     @Override
     public String toString() {
         return "Model{" +
                 "blocks=" + blocks +
+                "expression=" + expression +
                 '}';
     }
 }
