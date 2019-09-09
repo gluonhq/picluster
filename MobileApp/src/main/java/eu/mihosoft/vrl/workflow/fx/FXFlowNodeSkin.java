@@ -694,7 +694,7 @@ public class FXFlowNodeSkin
 
         double inset = 120;
         double minInset = 60;
-        double minSize = 8;
+        double minSize = 40;
 
         connectorSizes.clear();
 

@@ -136,7 +136,7 @@ public class FXConnectorUtil {
 
     public static void connnectionEstablishedAnim(Node receiverUI) {
 
-        System.out.println("established");
+//        System.out.println("established");
 
         if (timeline != null) {
             timeline.stop();

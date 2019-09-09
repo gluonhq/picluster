@@ -21,6 +21,8 @@ public class StringFlowNodeSkin extends CustomFXFlowNodeSkin {
         textField.setMinWidth(50);
         textField.setPrefWidth(50);
         textField.setMaxWidth(50);
+        textField.textProperty().addListener((obs, ov, nv) ->
+                getModel().getValueObject().setValue(nv));
         return new StackPane(textField);
     }
 }
