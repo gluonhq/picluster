@@ -1,14 +1,18 @@
 package com.gluonhq.picluster.server;
 
-import com.gluonhq.connect.provider.ListDataReader;
-import com.gluonhq.connect.provider.RestClient;
-import com.gluonhq.picluster.mobile.model.Model;
 import com.gluonhq.picluster.mobile.model.Wrapper;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import java.io.IOException;
-import java.util.Iterator;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
@@ -17,9 +21,9 @@ public class ExternalRequestHandler {
     private static final String BLOCKS = "blocks-v1";
     private static final long DELAY =  10_000;
 
-    static final int TIMEOUT_SECONDS = 10;
+    private static final int TIMEOUT_SECONDS = 10;
 
-    Logger logger = Logger.getLogger("ExternalRequest");
+    private Logger logger = Logger.getLogger("ExternalRequest");
 
     private final AutonomousDatabaseWriter autonomousDatabaseWriter;
     private final String GLUON_SERVER_KEY;
@@ -31,20 +35,10 @@ public class ExternalRequestHandler {
     }
 
     public void startListening() throws IOException {
-        RestClient restList = RestClient.create()
-                .method("GET")
-                .host("https://cloud.gluonhq.com")
-                .header("Authorization", "Gluon " + GLUON_SERVER_KEY)
-                .path("/3/data/enterprise/list/" + BLOCKS);
-
-        Jsonb jsonb = JsonbBuilder.create();
         while (true) {
-            ListDataReader<Wrapper> listDataReader = restList.createListDataReader(Wrapper.class);
-            Iterator<Wrapper> it = listDataReader.iterator();
-            while (it.hasNext()) {
-                Wrapper wrapper = it.next();
+            List<Wrapper> wrappers = listRequest();
+            wrappers.forEach(wrapper -> {
                 String uid = wrapper.getUid();
-                Model model = jsonb.fromJson(wrapper.getPayload(), Model.class);
 
                 Task task = new Task();
                 task.url = wrapper.getPayload();
@@ -57,10 +51,10 @@ public class ExternalRequestHandler {
                         removeRequest(uid);
                         finalAnswer = task.answer;
                     } else {
-                        System.err.println("Got no answer");
+                        logger.warning("Got no answer");
                     }
                 } catch (InterruptedException e) {
-                    System.err.println("FAILED to get response in " + TIMEOUT_SECONDS + " seconds");
+                    logger.severe("FAILED to get response in " + TIMEOUT_SECONDS + " seconds");
                     finalAnswer = "INTERRUPT";
                 }
 
@@ -70,7 +64,7 @@ public class ExternalRequestHandler {
 
                 String response = "We're done, answer = " + finalAnswer + "\n";
                 logger.info(response);
-            }
+            });
 
             try {
                 Thread.sleep(DELAY);
@@ -78,15 +72,45 @@ public class ExternalRequestHandler {
         }
     }
 
-    private void removeRequest(String uid) {
-        ProcessBuilder pb = new ProcessBuilder("curl", "-X", "POST",
-                "https://cloud.gluonhq.com/3/data/enterprise/list/" + BLOCKS +"/remove/" + uid,
-                "-H", "Authorization: Gluon " + GLUON_SERVER_KEY,
-                "-H", "Content-Type: application/json");
-        pb.redirectErrorStream(true);
+    private List<Wrapper> listRequest() {
+        HttpClient httpClient = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(10))
+                .followRedirects(HttpClient.Redirect.NORMAL)
+                .build();
+        HttpRequest httpRequest = HttpRequest.newBuilder()
+                .uri(URI.create("https://cloud.gluonhq.com/3/data/enterprise/list/" + BLOCKS))
+                .header("Authorization", "Gluon " + GLUON_SERVER_KEY)
+                .GET()
+                .build();
+
         try {
-            pb.start();
-        } catch (IOException e) {
+            HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+            Jsonb jsonb = JsonbBuilder.create();
+            return Arrays.asList(jsonb.fromJson(response.body(), Wrapper[].class));
+        } catch (IOException | InterruptedException e) {
+            logger.severe("Error processing list request");
+            e.printStackTrace();
+        }
+
+        return new ArrayList<>();
+    }
+
+    private void removeRequest(String uid) {
+        HttpClient httpClient = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(10))
+                .followRedirects(HttpClient.Redirect.NORMAL)
+                .build();
+        HttpRequest httpRequest = HttpRequest.newBuilder()
+                .uri(URI.create("https://cloud.gluonhq.com/3/data/enterprise/list/" + BLOCKS + "/remove/" + uid))
+                .header("Authorization", "Gluon " + GLUON_SERVER_KEY)
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(""))
+                .build();
+        try {
+            HttpResponse<?> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.discarding());
+            logger.info("uid: " + uid + " removed with response: " + response.statusCode());
+        } catch (IOException | InterruptedException e) {
+            logger.severe("Error processing remove request");
             e.printStackTrace();
         }
     }
