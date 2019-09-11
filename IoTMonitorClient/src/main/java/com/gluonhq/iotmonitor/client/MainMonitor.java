@@ -17,6 +17,8 @@ import java.util.Random;
  */
 public class MainMonitor {
 
+    private final static int RETRIES = 10;
+
     private final static boolean TEST_MODE = "test".equalsIgnoreCase(System.getenv("picluster_mode"));
 
     private final static String HOST = TEST_MODE ? "localhost" : "192.168.68.112";
@@ -38,14 +40,28 @@ public class MainMonitor {
         try {
             if (args.length == 1) {
                 System.err.println("Connecting to iot server at "+args[0]);
-                talk(args[0]);
+                setupTalk(args[0]);
             } else {
                 System.err.println("No host provided, using default "+HOST);
                 System.err.println("Use java ... MainMonitor <hostIP> to specify a host");
-                talk(HOST);
+                setupTalk(HOST);
             }
-        } catch (IOException e) {
+        } catch (InterruptedException e) {
             e.printStackTrace();
+        }
+    }
+
+    private static void setupTalk (String host) throws InterruptedException {
+        int failures = 0;
+        while (failures < RETRIES) {
+            try {
+                talk (host);
+            } catch (IOException e) {
+                e.printStackTrace();
+                failures++;
+                System.err.println("Got a failure ("+failures+" in total). Will keep retrying "+RETRIES+" times.");
+            }
+            Thread.sleep(10000);
         }
     }
 
@@ -54,6 +70,7 @@ public class MainMonitor {
 
         OutputStream os = s.getOutputStream();
         InputStream is = s.getInputStream();
+        System.err.println("device is connected to monitor at "+host);
         Thread outThread = new Thread(() -> {
             boolean go = true;
             BufferedWriter br = new BufferedWriter(new OutputStreamWriter(os));
