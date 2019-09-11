@@ -33,29 +33,33 @@ public class MainWorker {
             } else {
                 runJobs(SERVER_IP, DISPLAY_IP);
             }
-        } catch (IOException e) {
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
         System.err.println("SHOULD NOT REACH HERE, best to reboot!");
     }
 
-    static void runJobs(String serverIP, String displayIP) throws IOException {
+    static void runJobs(String serverIP, String displayIP) throws IOException, InterruptedException {
         while (go) {
             System.err.println("Create socket...");
             String msg = ID+SEP+"ask"+SEP+"\n";
             String job = sendSingleMessage(serverIP, msg);
+            if (job == null) {
+               System.err.println("We got a null job from the server at "+serverIP);
+               System.err.println("Server is unreachable? Waiting 10 seconds...");
+               Thread.sleep(10000);
+            } else {
+                int idx = job.indexOf(SEP);
+                String taskId = job.substring(0, idx);
+                String url = job.substring(idx+1);
+                System.err.println("Need to process "+url);
+                int answer = processURL(taskId, url);
 
+                msg = ID+SEP+"answer"+SEP+taskId+SEP+answer+"\n";
+                sendResultToDisplayApp(displayIP, answer);
+                sendSingleMessage(serverIP, msg);
 
-            int idx = job.indexOf(SEP);
-            String taskId = job.substring(0, idx);
-            String url = job.substring(idx+1);
-            System.err.println("Need to process "+url);
-            int answer = processURL(taskId, url);
-
-            msg = ID+SEP+"answer"+SEP+taskId+SEP+answer+"\n";
-            sendResultToDisplayApp(displayIP, answer);
-            sendSingleMessage(serverIP, msg);
-
+            }
         }
     }
 
@@ -71,24 +75,35 @@ public class MainWorker {
         return answer;
     }
 
-    static String sendSingleMessage (String serverIP, String msg) throws IOException {
-        Socket s = new Socket(serverIP, SERVER_PORT);
-        System.err.println("Need to send "+msg+", Socket created");
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
-
-        System.err.println("Write message: "+msg);
-        bw.write(msg);
-        bw.flush();
-        System.err.println("Message written");
-        BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream()));
-        System.err.println("Waiting for answer on "+msg);
-        String job = br.readLine();
-        // send ACK so server knows we'll do this job
-        bw.write(1);
-        bw.flush();
-        br.close();
-        bw.close();
-        s.close();
+    static String sendSingleMessage (String serverIP, String msg) throws InterruptedException {
+        System.err.println("Creating socket to "+serverIP+":"+SERVER_PORT);
+        boolean success = false;
+        String job = null;
+        while (!success) {
+            try {
+                Socket s = new Socket(serverIP, SERVER_PORT);
+                System.err.println("Need to send "+msg+", Socket created");
+                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
+        
+                System.err.println("Write message: "+msg);
+                bw.write(msg);
+                bw.flush();
+                System.err.println("Message written");
+                BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream()));
+                System.err.println("Waiting for answer on "+msg);
+                job = br.readLine();
+                // send ACK so server knows we'll do this job
+                bw.write(1);
+                bw.flush();
+                br.close();
+                bw.close();
+                s.close();
+                success = true;
+            } catch (IOException e) {
+                System.err.println("Error sending single message to "+serverIP);
+                Thread.sleep(10000);
+            }
+        }
         System.err.println("SingleMessage will return "+job);
         return job;
     }
