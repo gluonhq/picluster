@@ -17,7 +17,8 @@ import java.util.Random;
  */
 public class MainMonitor {
 
-    private final static int RETRIES = 10;
+    // keep retrying for 18,000 seconds = 5 hours
+    private final static int RETRIES = 1800;
 
     private final static boolean TEST_MODE = "test".equalsIgnoreCase(System.getenv("picluster_mode"));
 
