@@ -3,6 +3,7 @@ package com.gluonhq.picluster.mobile.service;
 import com.gluonhq.cloudlink.client.data.DataClient;
 import com.gluonhq.cloudlink.client.data.DataClientBuilder;
 import com.gluonhq.cloudlink.client.data.OperationMode;
+import com.gluonhq.cloudlink.client.data.SyncFlag;
 import com.gluonhq.cloudlink.client.usage.UsageClient;
 import com.gluonhq.connect.GluonObservableList;
 import com.gluonhq.connect.provider.DataProvider;
@@ -26,7 +27,7 @@ public class Service {
                 .operationMode(OperationMode.CLOUD_FIRST)
                 .build();
 
-        blocks = DataProvider.retrieveList(dataClient.createListDataReader(BLOCKS, Model.class), SyncFlag.LIST_WRITE_THROUGH );
+        blocks = DataProvider.retrieveList(dataClient.createListDataReader(BLOCKS, Model.class, SyncFlag.LIST_WRITE_THROUGH));
     }
 
     public void addBlock(Model block) {
