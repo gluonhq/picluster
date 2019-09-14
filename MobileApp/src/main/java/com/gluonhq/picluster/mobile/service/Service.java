@@ -26,7 +26,7 @@ public class Service {
                 .operationMode(OperationMode.CLOUD_FIRST)
                 .build();
 
-        blocks = DataProvider.retrieveList(dataClient.createListDataReader(BLOCKS, Model.class));
+        blocks = DataProvider.retrieveList(dataClient.createListDataReader(BLOCKS, Model.class), SyncFlag.LIST_WRITE_THROUGH );
     }
 
     public void addBlock(Model block) {
