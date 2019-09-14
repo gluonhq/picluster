@@ -111,7 +111,7 @@ public class DataReader {
         void processMessage(String id, String status) {
             // first part is ID
             String[] split = status.split(SEP);
-            if (split.length != 4) {
+            if (split.length != 5) {
                 return;
             }
             String cmd = split[1];
@@ -121,6 +121,7 @@ public class DataReader {
             if (cmd.equals("cpu")) {
                 double v1 = Double.parseDouble(split[2]);
                 double v2 = Double.parseDouble(split[3]);
+                double v3 = Double.parseDouble(split[4]);
 //                System.err.println("Values = " + v1 + " " + v2);
                 Platform.runLater(() -> {
                     Node node = Model.getNodeById(id);
@@ -131,6 +132,7 @@ public class DataReader {
                     } else {
                         node.getStat().cpu.set(v1);
                         node.getStat().mem.set(v2);
+                        node.getStat().temp.set(v3);
                     }
                     node.lastPing().set(System.nanoTime());
                 });

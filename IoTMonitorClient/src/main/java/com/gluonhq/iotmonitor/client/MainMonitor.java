@@ -27,6 +27,7 @@ public class MainMonitor {
     private final static String SEP = ";";
     private final static ProcessBuilder pbCpu;
     private final static ProcessBuilder pbMem;
+    private final static ProcessBuilder pbTem;
 
     static {
         pbCpu = new ProcessBuilder( "/bin/sh", "-c");
@@ -35,6 +36,9 @@ public class MainMonitor {
         pbMem = new ProcessBuilder( "/bin/sh", "-c");
         pbMem.command().add("vmstat -s | awk  ' $0 ~ /total memory/ {total=$1 } $0 ~/free memory/ {free=$1} $0 ~/buffer memory/ {buffer=$1} $0 ~/cache/ {cache=$1} END{print (total-free-buffer-cache)/total*100}'");
         pbMem.redirectErrorStream(true);
+        pbTem = new ProcessBuilder( "/bin/sh", "-c");
+        pbTem.command().add("cat /sys/class/thermal/thermal_zone0/temp");
+        pbTem.redirectErrorStream(true);
     }
 
     public static void main(String[] args) {
@@ -84,7 +88,7 @@ public class MainMonitor {
                 go = false;
             }
             while (go) {
-                String msg = "ID" + SEP + "cpu" + SEP + getCpuUsage() + SEP + getMemUsage() + "\n";
+                String msg = "ID" + SEP + "cpu" + SEP + getCpuUsage() + SEP + getMemUsage() + SEP + getTemperature() + "\n";
                 try {
                     br.write(msg);
                     br.flush();
@@ -126,37 +130,34 @@ public class MainMonitor {
     }
 
     private static double getCpuUsage() {
-        if (TEST_MODE) {
-            return new Random().nextDouble() * 100;
-        }
-        String answer;
-        try {
-            Process p = pbCpu.start();
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
-                answer = reader.readLine();
-            }
-            if (p.waitFor() == 0) {
-                return 100 - Double.parseDouble(answer);
-            }
-            System.out.println("Error, answer: " + answer);
-        } catch (IOException | InterruptedException | NumberFormatException ex) {
-            System.err.println("Error processing " + ex.getMessage());
+        double v = runProcess(pbCpu);
+        if (v > 0) {
+            return 100 - v;
         }
         return 0d;
     }
 
     private static double getMemUsage() {
-        if (TEST_MODE) {
-            return new Random().nextDouble() * 100;
+        return runProcess(pbMem);
+    }
+
+    private static double getTemperature() {
+        double v = runProcess(pbTem);
+        if (v > 0) {
+            return v / 1000d;
         }
+        return v;
+    }
+
+    private static double runProcess(ProcessBuilder pb) {
         String answer;
         try {
-            Process p = pbMem.start();
+            Process p = pb.start();
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
                 answer = reader.readLine();
             }
             if (p.waitFor() == 0) {
-                return Double.parseDouble(answer);
+                return Double.valueOf(answer);
             }
             System.out.println("Error, answer: " + answer);
         } catch (IOException | InterruptedException | NumberFormatException ex) {
