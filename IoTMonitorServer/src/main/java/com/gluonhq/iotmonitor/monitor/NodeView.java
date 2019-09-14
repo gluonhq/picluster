@@ -31,6 +31,7 @@ class NodeView extends Region {
 
     private ChartData cpuItem        = new ChartData("CPU", Bright.RED);
     private ChartData memItem        = new ChartData("MEM", Bright.BLUE);
+    private ChartData tempItem        = new ChartData("TEMP", Bright.GREEN_YELLOW);
     private GradientLookup gradientLookup = new GradientLookup(Arrays.asList(
             new Stop(0.0, Bright.GREEN), 
             new Stop(0.4, Bright.YELLOW), 
@@ -42,24 +43,7 @@ class NodeView extends Region {
             .prefSize(TILE_WIDTH, TILE_HEIGHT)
             .unit("\u0025")
             .title("RESOURCE UTILIZATION")
-            .chartData(memItem, cpuItem)
-            .build();
-
-    private Tile tempView = TileBuilder.create()
-            .skinType(SkinType.BAR_GAUGE)
-            .prefSize(TILE_WIDTH, TILE_HEIGHT)
-            .minValue(0)
-            .maxValue(120)
-            .threshold(80)
-            .thresholdVisible(true)
-            .startFromZero(true)
-            .decimals(0)
-            .title("TEMPERATURE")
-            .unit("C")
-            .gradientStops(new Stop(0, Bright.GREEN),
-                    new Stop(0.4, Bright.YELLOW),
-                    new Stop(0.8, Bright.RED))
-            .strokeWithGradient(true)
+            .chartData(memItem, cpuItem, tempItem)
             .build();
 
     NodeView(Node node){
@@ -81,7 +65,7 @@ class NodeView extends Region {
         
         cpuMemView.setSkin(new CpuMemTileSkin(cpuMemView));
         
-        HBox upperBox = new HBox(cpuMemView, tempView);
+        HBox upperBox = new HBox(cpuMemView);
         upperBox.getStyleClass().add("upper-box");
 
         Label header = new Label("Time since last ping");
@@ -121,7 +105,10 @@ class NodeView extends Region {
             memItem.setFillColor(gradientLookup.getColorAt(nv.doubleValue() / 100.0));
             memItem.setValue(nv.doubleValue());
         });
-        tempView.valueProperty().bind(node.getStat().temp);
+        node.getStat().temp.addListener((o, ov, nv) -> {
+            tempItem.setFillColor(gradientLookup.getColorAt(nv.doubleValue() / 100.0));
+            tempItem.setValue(nv.doubleValue());
+        });
 
         elapsedTime.textProperty().bind(node.elapsedTime().asString());
 
