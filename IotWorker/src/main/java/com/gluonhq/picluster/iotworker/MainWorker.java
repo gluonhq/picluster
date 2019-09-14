@@ -33,7 +33,7 @@ public class MainWorker {
             } else {
                 runJobs(SERVER_IP, DISPLAY_IP);
             }
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
         System.err.println("SHOULD NOT REACH HERE, best to reboot!");
