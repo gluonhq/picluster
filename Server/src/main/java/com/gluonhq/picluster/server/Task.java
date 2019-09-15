@@ -6,7 +6,6 @@ import java.util.concurrent.CountDownLatch;
 public class Task {
 
     final String id;
-    String uid;
     String url;
     String answer;
     CountDownLatch latch = new CountDownLatch(1);
@@ -14,6 +13,10 @@ public class Task {
 
     public Task() {
         this.id = UUID.randomUUID().toString();
+    }
+
+    public Task(String id) {
+        this.id = id;
     }
 
 }

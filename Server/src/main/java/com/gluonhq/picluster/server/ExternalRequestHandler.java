@@ -39,12 +39,11 @@ public class ExternalRequestHandler {
             List<Wrapper> wrappers = listRequest();
             wrappers.forEach(wrapper -> {
                 String uid = wrapper.getUid();
-// if TaskQueue contains task with uid uid, skip this
-
-                Task task = new Task();
-                task.url = wrapper.getPayload();
-                TaskQueue.add(task);
-                String finalAnswer = "PROCESSING";
+                if (!TaskQueue.containsTaskWithId(uid)) {
+                    Task task = new Task(uid);
+                    task.url = wrapper.getPayload();
+                    TaskQueue.add(task);
+                    String finalAnswer = "PROCESSING";
 /*
                 try {
                     if (task.latch.await(TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
@@ -64,8 +63,9 @@ public class ExternalRequestHandler {
                 }
 */
 
-                String response = "We're done, answer = " + finalAnswer + "\n";
-                logger.info(response);
+                    String response = "We're done, answer = " + finalAnswer + "\n";
+                    logger.info(response);
+                }
             });
 
             try {

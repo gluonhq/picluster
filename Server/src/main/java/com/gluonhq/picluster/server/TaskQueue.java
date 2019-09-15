@@ -21,6 +21,13 @@ public class TaskQueue {
         logger.fine("Notified all waiters");
     }
 
+    static boolean containsTaskWithId(String id) {
+        synchronized (queue) {
+            Optional<Task> opt = queue.stream().filter(t -> !t.id.equals(id)).findFirst();
+            return opt.isPresent();
+        }
+    }
+
     static int getQueueSize() {
         return queue.size();
     }
