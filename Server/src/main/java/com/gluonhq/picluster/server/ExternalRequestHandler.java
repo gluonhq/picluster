@@ -23,10 +23,10 @@ public class ExternalRequestHandler {
 
     private static final int TIMEOUT_SECONDS = 10;
 
-    private Logger logger = Logger.getLogger("ExternalRequest");
+    private static Logger logger = Logger.getLogger("ExternalRequest");
 
     private final AutonomousDatabaseWriter autonomousDatabaseWriter;
-    private final String GLUON_SERVER_KEY;
+    private static String GLUON_SERVER_KEY;
 
     public ExternalRequestHandler(AutonomousDatabaseWriter autonomousDatabaseWriter, String gluonServerKey) {
         this.autonomousDatabaseWriter = autonomousDatabaseWriter;
@@ -39,12 +39,13 @@ public class ExternalRequestHandler {
             List<Wrapper> wrappers = listRequest();
             wrappers.forEach(wrapper -> {
                 String uid = wrapper.getUid();
+// if TaskQueue contains task with uid uid, skip this
 
                 Task task = new Task();
                 task.url = wrapper.getPayload();
                 TaskQueue.add(task);
-
-                String finalAnswer = "TIMEOUT";
+                String finalAnswer = "PROCESSING";
+/*
                 try {
                     if (task.latch.await(TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
                         logger.info("Got answer: "+task.answer+"\n");
@@ -61,6 +62,7 @@ public class ExternalRequestHandler {
                 if (autonomousDatabaseWriter != null) {
                     autonomousDatabaseWriter.logClientRequestAndAnswer(task.id, task.url, finalAnswer);
                 }
+*/
 
                 String response = "We're done, answer = " + finalAnswer + "\n";
                 logger.info(response);
@@ -95,7 +97,7 @@ public class ExternalRequestHandler {
         return new ArrayList<>();
     }
 
-    private void removeRequest(String uid) {
+    public static void removeRequest(String uid) {
         HttpClient httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(10))
                 .followRedirects(HttpClient.Redirect.NORMAL)

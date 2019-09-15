@@ -141,6 +141,7 @@ public class DeviceListener {
                 bw.flush();
                 task.answer = result;
                 task.latch.countDown();
+ExternalRequestHandler.removeRequest(taskId);
             }
         }
     }
