@@ -11,15 +11,20 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Logger;
 
+import com.gluonhq.picluster.mobile.GluonCloudLinkService;
+
 public class DeviceListener {
 
-    static Logger logger = Logger.getLogger("DeviceListener");
+    static Logger logger = Logger.getLogger(DeviceListener.class.getName());
 
     private static final int PORT = 39265;
     boolean accepting = true;
     String SEP = ";";
 
-    public DeviceListener() {
+    private final GluonCloudLinkService gluonCloudLinkService;
+
+    public DeviceListener(GluonCloudLinkService gluonCloudLinkService) {
+        this.gluonCloudLinkService = gluonCloudLinkService;
     }
 
     public void startListening()  {
@@ -140,7 +145,7 @@ public class DeviceListener {
                 bw.write("thanks\n");
                 bw.flush();
                 task.answer = result;
-                task.latch.countDown();
+                gluonCloudLinkService.removeObjectFromList(ExternalRequestHandler.GLUONLIST_BLOCKS, task.id);
             }
         }
     }

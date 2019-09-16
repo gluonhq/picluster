@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 public class TaskQueue {
 
     private static LinkedList<Task> queue = new LinkedList<>();
-    static Logger logger = Logger.getLogger("ExternalRequest");
+    static Logger logger = Logger.getLogger(TaskQueue.class.getName());
 
     static void add(Task task) {
         logger.info("Adding a task to the queue");
@@ -23,6 +23,10 @@ public class TaskQueue {
 
     static int getQueueSize() {
         return queue.size();
+    }
+
+    static boolean taskAlreadyAdded(Task newTask) {
+        return queue.stream().anyMatch(task -> task.id.equals(newTask.id));
     }
 
     static Task getAvailableTask (boolean blocking) {

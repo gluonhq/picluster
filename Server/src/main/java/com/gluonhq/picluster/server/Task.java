@@ -1,18 +1,19 @@
 package com.gluonhq.picluster.server;
 
 import java.util.UUID;
-import java.util.concurrent.CountDownLatch;
+
+import com.gluonhq.picluster.mobile.model.GluonObject;
 
 public class Task {
 
     final String id;
     String url;
     String answer;
-    CountDownLatch latch = new CountDownLatch(1);
     boolean processing = false;
 
-    public Task() {
-        this.id = UUID.randomUUID().toString();
+    public Task(GluonObject gluonObject) {
+        this.id = gluonObject.getUid();
+        this.url = gluonObject.getPayload();
     }
 
 }
