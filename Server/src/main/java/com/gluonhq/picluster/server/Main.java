@@ -4,6 +4,8 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.gluonhq.picluster.mobile.GluonCloudLinkService;
+
 public class Main {
 
     private static final Logger logger = Logger.getLogger(Main.class.getName());
@@ -26,11 +28,10 @@ public class Main {
      */
     public static void main(String[] args) throws Exception {
         System.err.println("Starting main server");
-        DeviceListener dl = new DeviceListener();
-        dl.startListening();
 
         AutonomousDatabaseWriter autonomousDatabaseWriter = null;
-        String gluonServerKey = "";
+
+        String cloudlinkServerKey = "";
 
         if (args.length >= 3) {
             autonomousDatabaseWriter = new AutonomousDatabaseWriter(args[0], args[1]);
@@ -40,12 +41,16 @@ public class Main {
                 // too bad if the connection pool to the oracle Autonomous Database could not be setup
                 logger.log(Level.SEVERE, "Failed to setup connection pool to oracle autonomous database.", sql);
             }
-            gluonServerKey = args[2];
+            cloudlinkServerKey = args[2];
         }
 
-        ExternalRequestHandler ext = new ExternalRequestHandler(autonomousDatabaseWriter, gluonServerKey);
-        ext.startListening();
-    }
+        GluonCloudLinkService gluonCloudLinkService = new GluonCloudLinkService(cloudlinkServerKey);
 
+        DeviceListener deviceListener = new DeviceListener(gluonCloudLinkService);
+        deviceListener.startListening();
+
+        ExternalRequestHandler externalRequestHandler = new ExternalRequestHandler(autonomousDatabaseWriter, gluonCloudLinkService);
+        externalRequestHandler.startListening();
+    }
 
 }

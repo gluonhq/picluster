@@ -1,6 +1,6 @@
 package com.gluonhq.picluster.mobile.model;
 
-public class Wrapper {
+public class GluonObject {
     private String appkey;
     private String payload;
     private String uid;
@@ -31,7 +31,7 @@ public class Wrapper {
 
     @Override
     public String toString() {
-        return "Wrapper{" +
+        return "GluonObject{" +
                 "appkey='" + appkey + '\'' +
                 ", payload='" + payload + '\'' +
                 ", uid='" + uid + '\'' +
