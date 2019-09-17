@@ -1,10 +1,14 @@
 package com.gluonhq.picluster.display;
 
+import com.gluonhq.iotmonitor.monitor.MonitorNode;
 import com.gluonhq.picluster.display.model.Chunk;
 import com.gluonhq.picluster.display.service.Service;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -19,10 +23,12 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class DisplayApp extends Application {
 
+    private static final int PHOTOS = 26;
     private static final int SIZE = 1024;
 
     private StackPane imagePane;
@@ -31,6 +37,7 @@ public class DisplayApp extends Application {
     private volatile boolean run;
     private final AtomicLong counter = new AtomicLong(-1);
     private Service service;
+    private int currentPic = -1;
 
     @Override
     public void start(Stage primaryStage) {
@@ -47,20 +54,30 @@ public class DisplayApp extends Application {
                 .mapToDouble(s -> s.getBounds().getMaxY())
                 .max().orElse(0) - y;
 
-        Image image = new Image(DisplayApp.class.getResourceAsStream("oracleboat.jpg"));
-        ImageView imageView = new ImageView(image);
-        imageView.setFitWidth(w);
-        imageView.setPreserveRatio(true);
-        imagePane = new StackPane(imageView);
+        imagePane = new StackPane();
+        imagePane.getStyleClass().add("content");
 
-        Scene scene = new Scene(imagePane, w, h);
+        MonitorNode monitor = new MonitorNode();
+        monitor.setMinHeight(h / 3d);
+        monitor.setPrefHeight(h / 3d);
+        monitor.setMaxHeight(h / 3d);
+        monitor.setPrefWidth(w);
+
+        StackPane stackPane = new StackPane(imagePane);
+        stackPane.getChildren().add(monitor);
+        StackPane.setAlignment(monitor, Pos.BOTTOM_CENTER);
+
+        Scene scene = new Scene(stackPane, w, h);
+        scene.setCursor(Cursor.NONE);
+        scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
         primaryStage.setScene(scene);
         primaryStage.initStyle(StageStyle.UNDECORATED);
+
         primaryStage.show();
         primaryStage.setX(x);
         primaryStage.setY(y);
 
-        splitImage(imageView.snapshot(null, null));
+        setRandomPhoto();
 
         service = new Service();
         service.start(this::processImageChunk);
@@ -95,19 +112,59 @@ public class DisplayApp extends Application {
         imagePane.getChildren().setAll(new Group(gridPane));
     }
 
+    private void setRandomPhoto() {
+        int pic = new Random().nextInt(PHOTOS) + 1;
+        if (pic == currentPic) {
+            setRandomPhoto();
+        }
+        currentPic = pic;
+        System.out.println("pic = " + pic);
+        Image image = new Image(DisplayApp.class.getResourceAsStream(String.format("/photos/pic%02d.jpg", currentPic)));
+        ImageView imageView = new ImageView(image);
+        imageView.setFitWidth(imagePane.getScene().getWidth());
+        imageView.setPreserveRatio(true);
+        imagePane.getChildren().setAll(imageView);
+
+        splitImage(imagePane.snapshot(null, null));
+    }
+
+    private double checkImageOverlay() {
+        return gridPane.getChildren().stream()
+                .filter(StackPane.class::isInstance)
+                .map(StackPane.class::cast)
+                .mapToDouble(n ->
+                        n.getChildren().get(1).getOpacity())
+                .sum() / (double) (SIZE_X * SIZE_Y);
+    }
+
+    private Node getCover(Chunk chunk) {
+        return gridPane.getChildren().stream()
+                .filter(StackPane.class::isInstance)
+                .filter(n -> GridPane.getColumnIndex(n) == chunk.getX() &&
+                        GridPane.getRowIndex(n) == chunk.getY())
+                .findFirst()
+                .map(StackPane.class::cast)
+                .map(n -> n.getChildren().get(1))
+                .orElse(null);
+    }
+
     private void processImageChunk(Chunk chunk) {
+        final Node cover = getCover(chunk);
+        if (cover == null) {
+            return;
+        }
+
+        double coverOpacity = cover.getOpacity();
+        if (coverOpacity == 0.0) {
+            processImageChunk(Chunk.getNextChunk(chunk, SIZE_X, SIZE_Y));
+        }
         Platform.runLater(() -> {
-            gridPane.getChildren().stream()
-                    .filter(StackPane.class::isInstance)
-                    .map(StackPane.class::cast)
-                    .filter(n -> GridPane.getColumnIndex(n) == chunk.getX() &&
-                            GridPane.getRowIndex(n) == chunk.getY())
-                    .findFirst()
-                    .ifPresent(n -> {
-                        Rectangle cover = (Rectangle) n.getChildren().get(1);
-                        cover.setOpacity(Math.max(0, cover.getOpacity() - chunk.getOpacity()));
-                    });
-            counter.set(-1);
+            cover.setOpacity(Math.max(0, coverOpacity - chunk.getOpacity()));
+            double totalOpacity = checkImageOverlay();
+            System.out.println("totalOpacity = " + totalOpacity);
+            if (totalOpacity < 0.01) {
+                setRandomPhoto();
+            }
         });
     }
 
@@ -130,7 +187,9 @@ public class DisplayApp extends Application {
 
     @Override
     public void stop() {
-        service.stop();
+        if (service != null) {
+            service.stop();
+        }
     }
 
     public static void main(String[] args) {

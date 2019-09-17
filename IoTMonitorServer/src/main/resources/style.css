@@ -1,14 +1,14 @@
-@import "scroll-pane.css"
+@import "scroll-pane.css";
 
-.root {
-    -fx-background-color: white;
+.monitor-node {
+    -fx-background-color: #e9e9e920;
 }
 
-.top-pane {
-    -fx-background-color: white;
+.monitor-node > .top-pane {
+    -fx-background-color: #d9d9d920;
     -fx-alignment: center;
     -fx-padding: 10 5 7 5;
-    -fx-border-width: 0 0 1 0;
+    -fx-border-width: 0 1 0 0;
     -fx-border-color: #c9c9c9;
 }
 
@@ -16,12 +16,12 @@
     -fx-padding: 5px;
     /* -fx-border-width: 0 0.5px 0.5px 0;
     -fx-border-color: gray; */
-    -fx-background-color: #e8e8e8;
+    -fx-background-color: #d8d8d820;
     -fx-background-radius: 5;
 }
 
 .node-view > .container:disconnect {
-    -fx-background-color: #E3864C;
+    -fx-background-color: #E3864C20;
 }
 
 .node-view > .container > .info-box {
@@ -30,6 +30,7 @@
 }
 
 .node-view > .container > .info-box > .label {
+    -fx-text-fill: #ffffff80;
     -fx-font-size: 0.8em;
     -fx-font-weight: bold;
 }
@@ -41,15 +42,19 @@
 }
 
 .node-view > .container > .graph-box > .lower-box > .elapsed-pane {
+    -fx-text-fill: #ffffff80;
     -fx-alignment: center-left;
     -fx-spacing: 5;
 }
 
-.node-view > .container > .graph-box > .lower-box > .elapsed-pane > .header {
+.node-view > .container > .graph-box > .lower-box > .elapsed-pane > .header,
+.node-view > .container > .graph-box > .lower-box > .elapsed-pane > .elapsed-time {
+    -fx-text-fill: #ffffff80;
     -fx-font-size: 0.75em;
 }
 
 .button {
+    -fx-text-fill: #ffffff80;
     -fx-background-color: transparent;
     -fx-border-color: transparent;
     -fx-border-width: 0;

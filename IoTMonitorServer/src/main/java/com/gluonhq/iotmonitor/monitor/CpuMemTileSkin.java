@@ -34,6 +34,8 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -69,11 +71,12 @@ public class CpuMemTileSkin extends TileSkin {
 
         chartPane = new VBox();
 
+        Collections.sort(tile.getChartData(), Comparator.comparing(ChartData::getName));
         tile.getChartData().forEach(data -> {
             data.addChartDataEventListener(updateHandler);
-            dataItemMap.put(data, new ChartItem(data, contentBounds));
+            dataItemMap.put(data, new ChartItem(data, contentBounds, data.getFormatString()));
+            chartPane.getChildren().add(dataItemMap.get(data));
         });
-        chartPane.getChildren().setAll(dataItemMap.values());
 
         titleText = new Text();
         titleText.setFill(tile.getTitleColor());
@@ -95,17 +98,16 @@ public class CpuMemTileSkin extends TileSkin {
                         addedData.addChartDataEventListener(updateHandler);
                         dataItemMap.put(addedData, new ChartItem(addedData, contentBounds));
                     });
-                    chartPane.getChildren().setAll(dataItemMap.values());
-                    updateChart();
                 } else if (change.wasRemoved()) {
                     change.getRemoved().forEach(removedData -> {
                         removedData.removeChartDataEventListener(updateHandler);
                         dataItemMap.remove(removedData);
                     });
-                    chartPane.getChildren().setAll(dataItemMap.values());
-                    updateChart();
                 }
             }
+            chartPane.getChildren().clear();
+            dataItemMap.entrySet().forEach(entry -> chartPane.getChildren().add(entry.getValue()));
+            updateChart();
         }));
 
         pane.widthProperty().addListener(paneSizeListener);
@@ -200,7 +202,7 @@ public class CpuMemTileSkin extends TileSkin {
     }
 
     private void updateChart() {
-        int    noOfItems   = dataItemMap.size();
+        int noOfItems = dataItemMap.size();
         if (noOfItems == 0) return;
         for (int i = 0 ; i < noOfItems ; i++) {
             ChartData item = dataItemMap.keySet().iterator().next();
@@ -227,14 +229,17 @@ public class CpuMemTileSkin extends TileSkin {
 
 
         public ChartItem(final ChartData CHART_DATA, final CtxBounds CONTENT_BOUNDS) {
+            this(CHART_DATA, CONTENT_BOUNDS, "%.0f%%");
+        }
+        public ChartItem(final ChartData CHART_DATA, final CtxBounds CONTENT_BOUNDS, final String FORMAT_STRING) {
             chartData         = CHART_DATA;
             contentBounds     = CONTENT_BOUNDS;
             title             = new Label(chartData.getName());
-            value             = new Label(String.format(Locale.US, "%.0f%%", chartData.getValue()));
+            value             = new Label(String.format(Locale.US, FORMAT_STRING, chartData.getValue()));
             scale             = new Rectangle(0, 0);
             bar               = new Rectangle(0, 0);
-            formatString      = "%.0f%%";
-            step              = PREF_WIDTH / maxValue;
+            formatString      = FORMAT_STRING;
+            step              = PREF_WIDTH / CHART_DATA.getMaxValue();
             chartDataListener = e -> {
                 switch(e.getType()) {
                     case UPDATE  : bar.setFill(chartData.getFillColor()); break;
@@ -287,7 +292,7 @@ public class CpuMemTileSkin extends TileSkin {
             double width  = getPrefWidth();
             double height = getPrefHeight();
 
-            step = width / 100.0;
+            step = width / chartData.getMaxValue();
 
             double textWidth  = width * 0.5;
             double textHeight = height * 0.13;

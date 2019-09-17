@@ -48,6 +48,16 @@ public class Chunk {
         return null;
     }
 
+    public static Chunk getNextChunk(Chunk chunk, int maxX, int maxY) {
+        if (chunk.getX() + 1 < maxX) {
+            return new Chunk(chunk.getX() + 1, chunk.getY(), chunk.getOpacity());
+        }
+        if (chunk.getY() + 1 < maxY) {
+            return new Chunk(chunk.getX(), chunk.getY() + 1, chunk.getOpacity());
+        }
+        return new Chunk(0, 0, chunk.getOpacity());
+    }
+
     @Override
     public String toString() {
         return "Chunk{" +

@@ -66,7 +66,7 @@ public class MainWorker {
     static int processURL (String taskId, String url) {
         System.err.println("Processing image at "+url+" with taskId "+taskId);
         try {
-            Thread.sleep(5000);
+            Thread.sleep(50);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

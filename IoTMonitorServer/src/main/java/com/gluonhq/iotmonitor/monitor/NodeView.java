@@ -4,8 +4,10 @@ import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.TileBuilder;
 import eu.hansolo.tilesfx.chart.ChartData;
+import eu.hansolo.tilesfx.chart.ChartDataBuilder;
 import eu.hansolo.tilesfx.colors.Bright;
 import eu.hansolo.tilesfx.tools.GradientLookup;
+import javafx.beans.binding.Bindings;
 import javafx.css.PseudoClass;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
@@ -29,21 +31,23 @@ class NodeView extends Region {
 
     private Node node;
 
-    private ChartData cpuItem        = new ChartData("CPU", Bright.RED);
-    private ChartData memItem        = new ChartData("MEM", Bright.BLUE);
-    private ChartData tempItem        = new ChartData("TEMP", Bright.GREEN_YELLOW);
+    private ChartData cpuItem  = ChartDataBuilder.create().name("CPU").formatString("%.0f%%").build();
+    private ChartData memItem  = ChartDataBuilder.create().name("MEM").formatString("%.0f%%").build();
+    private ChartData tempItem = ChartDataBuilder.create().name("TEMP").formatString("%.0f\u00b0C").maxValue(100).build();
+
     private GradientLookup gradientLookup = new GradientLookup(Arrays.asList(
             new Stop(0.0, Bright.GREEN), 
             new Stop(0.4, Bright.YELLOW), 
-            new Stop(0.8, Bright.RED))
+            new Stop(0.7, Bright.RED))
     );
 
     private Tile cpuMemView = TileBuilder.create()
             .skinType(SkinType.CUSTOM)
             .prefSize(TILE_WIDTH, TILE_HEIGHT)
             .unit("\u0025")
-            .title("RESOURCE UTILIZATION")
+            .title(" ")
             .chartData(memItem, cpuItem, tempItem)
+            .animated(false)
             .build();
 
     NodeView(Node node){
@@ -68,7 +72,7 @@ class NodeView extends Region {
         HBox upperBox = new HBox(cpuMemView);
         upperBox.getStyleClass().add("upper-box");
 
-        Label header = new Label("Time since last ping");
+        Label header = new Label("Last ping");
         header.getStyleClass().add("header");
         
         Label elapsedTime = new Label(" -- ");
@@ -91,7 +95,7 @@ class NodeView extends Region {
             }
         });
         
-       HBox lowerBox = new HBox(elapsedPane, spacer(), reboot);
+        HBox lowerBox = new HBox(elapsedPane, spacer(), reboot);
         lowerBox.getStyleClass().add("lower-box");
 
         VBox vbox = new VBox(upperBox, lowerBox);
@@ -108,15 +112,13 @@ class NodeView extends Region {
         node.getStat().temp.addListener((o, ov, nv) -> {
             tempItem.setFillColor(gradientLookup.getColorAt(nv.doubleValue() / 100.0));
             tempItem.setValue(nv.doubleValue());
+            cpuMemView.showNotifyRegion(tempItem.getOldValue() > 80);
         });
 
-        elapsedTime.textProperty().bind(node.elapsedTime().asString());
+        elapsedTime.textProperty().bind(Bindings.format("%d s", node.elapsedTime()));
 
-        Label ipLabel = new Label();
-        ipLabel.getStyleClass().add("ip-label");
-        ipLabel.textProperty().bind(node.lastKnownIp());
         Label idLabel = new Label(node.getId());
-        HBox infoBox = new HBox(idLabel, spacer(), ipLabel);
+        HBox infoBox = new HBox(idLabel);
         infoBox.getStyleClass().add("info-box");
 
         Insets insets = new Insets(2);

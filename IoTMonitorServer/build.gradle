@@ -9,7 +9,7 @@ repositories {
 }
 
 dependencies {
-    implementation ('eu.hansolo:tilesfx:11.2') {
+    implementation ('eu.hansolo:tilesfx:11.10') {
         exclude group:"org.hamcrest"
         exclude group:"org.openjfx"
     }
@@ -22,7 +22,7 @@ dependencies {
 
 javafx {
     version = "12.0.2"
-    modules = [ 'javafx.controls' ]
+    modules = [ 'javafx.controls', 'javafx.web' ]
 }
 
 mainClassName = "$moduleName/com.gluonhq.iotmonitor.monitor.Main"
@@ -50,7 +50,8 @@ jlink {
         addExtraModulePath("$rootDir/files/filesWin/javafx-jmods-12.0.2")
     }
     launcher {
-        jvmArgs = ["--add-exports", "javafx.graphics/com.sun.javafx.scene=org.controlsfx.controls",
+        jvmArgs = ["-Dprism.order=j2d",
+                   "--add-exports", "javafx.graphics/com.sun.javafx.scene=org.controlsfx.controls",
                    "--add-exports", "javafx.graphics/com.sun.javafx.scene.traversal=org.controlsfx.controls"]
         name = 'iotserver'
     }
